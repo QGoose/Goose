@@ -6,7 +6,9 @@ ICFP non-sense about quantum languages
 
 Compiling the project requires `opam` and `dune` to be installed
 
-**To install opam**
+**To install ocaml/opam**
+
+[ocaml website](https://ocaml.org/docs/up-and-running)
 
 **To install dune**
 ```
