@@ -1,0 +1,4 @@
+(executable
+ (name qgc)
+ (public_name qgc)
+ (libraries quantumlib))
