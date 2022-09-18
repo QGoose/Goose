@@ -23,10 +23,10 @@ let parse_id =
 let (let*) = (>>=)
 
 let parse_idx =
-  spaces >> between (token "[") (token "]") parse_nnint
+  between (token "[") (token "]") parse_nnint
 
 let parse_opt_idx =
-  spaces >> parse_idx => Option.some <|> return None
+  parse_idx => Option.some <|> return None
 
 let parse_arg =
   let* id = parse_id in
@@ -48,7 +48,7 @@ let parse_stmt =
     let* _  = token ";" in
     return (Qreg (id, nn))
   in
-  let gop  = todo ()
+  let gop _ = todo ()
   in
   let gate =
     let* id = parse_id in
@@ -57,10 +57,11 @@ let parse_stmt =
     let* l3 = between (token "{") (token "}") (many gop) in
     return (Gate (id, l1, l2, l3))
   in
-  let uop  = todo () in
+  let uop _ = todo () in
   let measure =
     let* _ = token "measure" << space in
     let* a1 = parse_arg in
+    let* _  = token "," in
     let* a2 = parse_arg in
     let* _  = token ";" in
     return (Q_measure (a1, a2))
@@ -73,9 +74,9 @@ let parse_stmt =
   in
   let qop  =
     choice [
-      uop => (fun op -> Q_uop op);
       measure;
-      reset
+      reset;
+      uop => (fun op -> Q_uop op)
     ]
   in
   let cond =
@@ -110,3 +111,7 @@ let parse_stmt =
     opaq;
     barr
   ]
+
+
+let parse_string s =
+  LazyStream.of_string s |> parse_stmt
