@@ -4,7 +4,7 @@ ICFP non-sense about quantum languages
 
 ## Instruction
 
-Compiling the project requires `opam` and `dune` to be installed
+Compiling the project requires `opam`, `opal` and `dune` to be installed
 
 **To install ocaml/opam**
 

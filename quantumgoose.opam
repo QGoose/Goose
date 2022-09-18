@@ -2,8 +2,12 @@
 opam-version: "2.0"
 synopsis: "A quantum computer simulator in OCaml"
 description: ""
+authors: [
+  "Arthur Correnson" "Denis Carnier" "Youssef Moawad" "Christopher McNally"
+]
 depends: [
   "dune" {>= "2.9"}
+  "opal"
   "odoc" {with-doc}
 ]
 build: [

@@ -6,4 +6,9 @@
  (name quantumgoose)
  (synopsis "A quantum computer simulator in OCaml")
  (description "")
- (depends))
+ (authors
+  "Arthur Correnson"
+  "Denis Carnier"
+  "Youssef Moawad"
+  "Christopher McNally")
+ (depends opal))
