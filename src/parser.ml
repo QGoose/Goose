@@ -6,13 +6,12 @@ let todo () = failwith "Unimplemented"
 let id x = Id x
 let nnint x = Nnint x
 
-
-let parse_nndigit =
-  (exactly '0' >> mzero) <|> digit
+let non_zero =
+  satisfy (function '1'..'9' -> true | _ -> false)
 
 let parse_nnint =
   spaces
-  >> many1 digit
+  >> (non_zero <~> many digit)
   => (implode % int_of_string % nnint)
 
 let parse_id =
@@ -46,7 +45,7 @@ let parse_stmt =
     let* id = parse_id in
     let* nn = parse_idx in
     let* _  = token ";" in
-    return (Qreg (id, nn))
+    return (Creg (id, nn))
   in
   let gop _ = todo ()
   in
