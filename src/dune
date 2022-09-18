@@ -1,3 +1,4 @@
 (library
  (name quantumlib)
- (public_name quantumgoose.quantumlib))
+ (public_name quantumgoose.quantumlib)
+ (libraries opal))

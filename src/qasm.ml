@@ -1,14 +1,14 @@
 type prog = {
-  version : int * int;
+  version : nnint * nnint;
   body : stmt list;
 }
 
 and stmt =
-  | Qreg of id * int
-  | Creg of id * int
-  | Gate of id * id list
-  | Quop of qop
-  | If of id * int * qop
+  | Qreg of id * nnint
+  | Creg of id * nnint
+  | Gate of id * id list * id list * gop list
+  | Qop of qop
+  | If of id * nnint * qop
   | Opaque of id * id list * id list
   | Barrier of arg list
 
@@ -28,12 +28,14 @@ and uop =
 
 and id = Id of string
 
+and nnint = Nnint of int
+
 and arg =
-  | A_id of id * int option
+  | A_id of id * nnint option
 
 and expr =
   | E_cst of float
-  | E_int of int
+  | E_int of nnint
   | E_Pi
   | E_id of id
   | E_bop of binaryop * expr * expr
