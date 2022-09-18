@@ -4,12 +4,19 @@ type prog = {
 }
 
 and stmt =
+  (* Quantum register *)
   | Qreg of id * nnint
+  (* Classical register *)
   | Creg of id * nnint
+  (* Gate declaration *)
   | Gate of id * id list * id list * gop list
+  (* Quantum operator *)
   | Qop of qop
+  (* Conditions *)
   | If of id * nnint * qop
+  (* Opaque *)
   | Opaque of id * id list * id list
+  (* Barrier *)
   | Barrier of arg list
 
 and gop =

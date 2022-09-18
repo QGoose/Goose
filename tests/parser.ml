@@ -28,7 +28,7 @@ let%test _ =
     "qreg y[2];"
     (Qreg (Id "y", Nnint 2))
 
-    let%test _ =
+let%test _ =
   assert_parse
     "Parsing creg 1"
     parse_stmt

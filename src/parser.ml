@@ -32,6 +32,8 @@ let parse_arg =
   let* nn = parse_opt_idx in
   return (A_id (id, nn))
 
+let parse_expr _ = todo ()
+
 let parse_stmt =
   let qreg =
     let* _  = token "qreg" << space in
@@ -51,12 +53,39 @@ let parse_stmt =
   in
   let gate =
     let* id = parse_id in
-    let* l1 = many parse_id in
-    let* l2 = many parse_id in
+    let* l1 = sep_by parse_id (token ",") in
+    let* l2 = sep_by1 parse_id (token ",") in
     let* l3 = between (token "{") (token "}") (many gop) in
     return (Gate (id, l1, l2, l3))
   in
-  let uop _ = todo () in
+  let uop_u =
+    let* _ = token "U" in
+    let* l = between (token "(") (token ")") (sep_by parse_expr (token ",")) in
+    let* a = parse_arg in
+    let* _ = token ";" in
+    return (U (l, a))
+  in
+  let uop_cx =
+    let* _  = token "CX" in
+    let* a1 = parse_arg in
+    let* _  = token "," in
+    let* a2 = parse_arg in
+    let* _ = token ";" in
+    return (CX (a1, a2))
+  in
+  let uop_app =
+    let* id = parse_id in
+    let* l1 = between (token "(") (token ")") (sep_by parse_expr (token ",")) in
+    let* l2 = sep_by1 parse_arg (token ",") in
+    return (App (id, l1, l2))
+  in
+  let uop =
+    choice [
+      uop_u;
+      uop_cx;
+      uop_app;
+    ]
+  in
   let measure =
     let* _ = token "measure" << space in
     let* a1 = parse_arg in
@@ -90,8 +119,8 @@ let parse_stmt =
   let opaq =
     let* _  = token "opaque" << space in
     let* id = parse_id in
-    let* l1 = many parse_id in
-    let* l2 = many parse_id in
+    let* l1 = sep_by parse_id (token ",") in
+    let* l2 = sep_by1 parse_id (token ",") in
     let* _  = token ";" in
     return (Opaque (id, l1, l2))
   in
