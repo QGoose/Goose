@@ -10,15 +10,23 @@ Compiling the project requires `opam` and `dune` to be installed
 
 [ocaml website](https://ocaml.org/docs/up-and-running)
 
-**To install dune**
+**To setup the project**
+
 ```
-opam install dune
+cd QuantumGoose
+opam install dune opal
 ```
 **To compile**
 
 ```
 dune build
 
+```
+
+**To test**
+
+```
+dune runtest
 ```
 
 **To execute the QuantumGoose compiler (qgc)**
