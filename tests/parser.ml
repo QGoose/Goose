@@ -43,7 +43,59 @@ let%test _ =
     (Creg (Id "y", Nnint 2))
 
 let%test _ =
-  assert_fail
-    "Parsing nnint leading zeros"
-    parse_nnint
-    "0001"
+  assert_parse
+    "Parsing simple measurement without indices"
+    parse_stmt
+    "measure x -> y;"
+    (Qop 
+      (Q_measure
+        ((A_id (Id "x", None))
+        ,(A_id (Id "y", None)))))
+
+let%test _ =
+  assert_parse
+    "Parsing arg without index"
+    parse_arg
+    "y"
+    (A_id (Id "y", None))
+
+let%test _ =
+  assert_parse
+    "Parsing arg with index"
+    parse_arg
+    "y[0]"
+    (A_id (Id "y", Some (Nnint 0)))
+    
+let%test _ =
+  assert_parse
+    "Parsing index"
+    parse_idx
+    "[1]"
+    (Nnint 1)
+
+let%test _ =
+  assert_parse
+    "Parsing zero index"
+    parse_idx
+    "[0]"
+    (Nnint 0)
+
+let%test _ =
+  assert_parse
+    "Parsing measurement with single index"
+    parse_stmt
+    "measure x -> y[0];"
+    (Qop 
+      (Q_measure
+        ((A_id (Id "x", None))
+        ,(A_id (Id "y", Some (Nnint 0))))))
+
+let%test _ =
+  assert_parse
+    "Parsing measurement with two indices"
+    parse_stmt
+    "measure x[0] -> y[1];"
+    (Qop 
+      (Q_measure
+        ((A_id (Id "x", Some (Nnint 0)))
+        ,(A_id (Id "y", Some (Nnint 1))))))

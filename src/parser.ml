@@ -9,9 +9,11 @@ let nnint x = Nnint x
 let non_zero =
   satisfy (function '1'..'9' -> true | _ -> false)
 
+let singleton_zero = exactly '0' >> return ['0']
+
 let parse_nnint =
   spaces
-  >> (non_zero <~> many digit)
+  >> (non_zero <~> many digit <|> singleton_zero)
   => (implode % int_of_string % nnint)
 
 let parse_id =
@@ -89,7 +91,7 @@ let parse_stmt =
   let measure =
     let* _ = token "measure" << space in
     let* a1 = parse_arg in
-    let* _  = token "," in
+    let* _  = token "->" in
     let* a2 = parse_arg in
     let* _  = token ";" in
     return (Q_measure (a1, a2))
