@@ -4,7 +4,7 @@ ICFP non-sense about quantum languages
 
 ## Instruction
 
-Compiling the project requires `opam`, `opal` and `dune` to be installed
+Compiling the project requires `opam`, `opal`, `dune`, and `ppx_inline_test` to be installed
 
 **To install ocaml/opam**
 
@@ -14,7 +14,7 @@ Compiling the project requires `opam`, `opal` and `dune` to be installed
 
 ```
 cd QuantumGoose
-opam install dune opal
+opam install dune opal ppx_inline_test
 ```
 **To compile**
 
