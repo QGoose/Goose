@@ -58,7 +58,7 @@ let parse_stmt =
     let* l1 = sep_by parse_id (token ",") in
     let* l2 = sep_by1 parse_id (token ",") in
     let* l3 = between (token "{") (token "}") (many gop) in
-    return (Gate (id, l1, l2, l3))
+    return (GateDecl (id, l1, l2, l3))
   in
   let uop_u =
     let* _ = token "U" in

@@ -9,7 +9,7 @@ and stmt =
   (* Classical register *)
   | Creg of id * nnint
   (* Gate declaration *)
-  | Gate of id * id list * id list * gop list
+  | GateDecl of id * id list * id list * gop list
   (* Quantum operator *)
   | Qop of qop
   (* Conditions *)

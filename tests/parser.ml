@@ -11,8 +11,14 @@ let assert_parse msg p i o =
 let assert_parse_fromString msg p i o =
   assert_parse msg p (LazyStream.of_string i) o
 
-let assert_parse_fromFile msg p f o =
-  assert_parse msg p (LazyStream.of_channel (open_in f)) o
+let read_file fn = LazyStream.of_channel (open_in fn)
+
+let assert_parse_fromFile p fn o =
+  assert_parse
+   (String.concat "" ["Parsing `"; fn; "`"])
+   p
+   (read_file (String.concat "/" ["../src/tests/input"; fn]))
+   o
 
 let assert_fail msg p i =
   print_endline msg;
@@ -111,3 +117,25 @@ let%test _ =
     "Parsing invalid measurement with three indices"
     parse_stmt
     "measure x[0] -> y[1] -> z[0];"
+
+let%test _ =
+  assert_fail
+    "Invalid missing semicolon"
+    parse_stmt
+    (String.concat "\n"
+      ["qreg x[1]"
+      ;"qreg y[2]"
+      ;"creg z[1]"
+      ;"creg w[2]"
+      ;"measure x -> y"
+      ])
+(* 
+let%test _ =
+  assert_parse_fromString
+    "Apply a user-defined unitary gate"
+    parse_stmt
+    "crz(x) q[0];"
+    (Qop (Q_uop (App
+      (Id "crz")
+     ,[E_id "x"]
+     ,[A_id (Id "q", Some (Nnint 0))]))) *)
