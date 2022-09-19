@@ -129,13 +129,14 @@ let%test _ =
       ;"creg w[2]"
       ;"measure x -> y"
       ])
-(* 
+
 let%test _ =
   assert_parse_fromString
     "Apply a user-defined unitary gate"
     parse_stmt
     "crz(x) q[0];"
-    (Qop (Q_uop (App
-      (Id "crz")
-     ,[E_id "x"]
-     ,[A_id (Id "q", Some (Nnint 0))]))) *)
+    (Qop (Q_uop
+      (App ((Id "crz")
+           ,[E_id (Id "x")]
+           ,[A_id (Id "q", Some (Nnint 0))]))))
+           
