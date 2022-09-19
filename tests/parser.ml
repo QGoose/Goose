@@ -2,11 +2,17 @@ open Quantumlib
 open Opal
 open Parser
 
-let assert_parse msg p i o =
+let assert_parse msg p i o = 
   print_endline msg;
-  match parse p (LazyStream.of_string i) with
+  match parse p i with
   | None -> false
   | Some x -> x = o
+
+let assert_parse_fromString msg p i o =
+  assert_parse msg p (LazyStream.of_string i) o
+
+let assert_parse_fromFile msg p f o =
+  assert_parse msg p (LazyStream.of_channel (open_in f)) o
 
 let assert_fail msg p i =
   print_endline msg;
@@ -15,35 +21,35 @@ let assert_fail msg p i =
   | Some _ -> false
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing qreg 1"
     parse_stmt
     "qreg x[1];"
     (Qreg (Id "x", Nnint 1))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing qreg 2"
     parse_stmt
     "qreg y[2];"
     (Qreg (Id "y", Nnint 2))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing creg 1"
     parse_stmt
     "creg x[1];"
     (Creg (Id "x", Nnint 1))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing creg 2"
     parse_stmt
     "creg y[2];"
     (Creg (Id "y", Nnint 2))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing simple measurement without indices"
     parse_stmt
     "measure x -> y;"
@@ -53,35 +59,35 @@ let%test _ =
         ,(A_id (Id "y", None)))))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing arg without index"
     parse_arg
     "y"
     (A_id (Id "y", None))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing arg with index"
     parse_arg
     "y[0]"
     (A_id (Id "y", Some (Nnint 0)))
     
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing index"
     parse_idx
     "[1]"
     (Nnint 1)
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing zero index"
     parse_idx
     "[0]"
     (Nnint 0)
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing measurement with single index"
     parse_stmt
     "measure x -> y[0];"
@@ -91,7 +97,7 @@ let%test _ =
         ,(A_id (Id "y", Some (Nnint 0))))))
 
 let%test _ =
-  assert_parse
+  assert_parse_fromString
     "Parsing measurement with two indices"
     parse_stmt
     "measure x[0] -> y[1];"
@@ -99,3 +105,9 @@ let%test _ =
       (Q_measure
         ((A_id (Id "x", Some (Nnint 0)))
         ,(A_id (Id "y", Some (Nnint 1))))))
+
+let%test _ =
+  assert_fail
+    "Parsing invalid measurement with three indices"
+    parse_stmt
+    "measure x[0] -> y[1] -> z[0];"
