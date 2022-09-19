@@ -94,6 +94,17 @@ let%test _ =
 
 let%test _ =
   assert_parse_fromString
+    "Parsing register measurement"
+    parse_stmt
+    "measure q -> c;"
+    (Qop 
+      (Q_measure
+        ((A_id (Id "q", None))
+        ,(A_id (Id "c", None)))))
+
+
+let%test _ =
+  assert_parse_fromString
     "Parsing measurement with single index"
     parse_stmt
     "measure x -> y[0];"
@@ -104,7 +115,7 @@ let%test _ =
 
 let%test _ =
   assert_parse_fromString
-    "Parsing measurement with two indices"
+    "Parsing single qubit measurement"
     parse_stmt
     "measure x[0] -> y[1];"
     (Qop 
@@ -130,6 +141,7 @@ let%test _ =
       ;"measure x -> y"
       ])
 
+(* Unimplemented Gop & Expr *)
 let%test _ =
   assert_parse_fromString
     "Apply a user-defined unitary gate"
@@ -140,3 +152,57 @@ let%test _ =
            ,[E_id (Id "x")]
            ,[A_id (Id "q", Some (Nnint 0))]))))
            
+
+let%test _ =
+  assert_parse_fromString
+    "Apply built-in CNOT gate"
+    parse_stmt
+    "CX q[0], q[1];"
+    (Qop (Q_uop (CX
+      (A_id (Id "q", Some (Nnint 0))
+      ,A_id (Id "q", Some (Nnint 1))))))
+
+let%test _ =
+  assert_parse_fromString
+    "Parsing prepare qubits in |0>"
+    parse_stmt
+    "reset q[0];"
+    (Qop (Q_reset (A_id (Id "q", Some (Nnint 0)))))
+
+let%test _ =
+  assert_parse_fromString
+    "Parsing simple prepare qubits"
+    parse_stmt
+    "reset q;"
+    (Qop (Q_reset (A_id (Id "q", None))))
+
+let%test _ =
+  assert_parse_fromString
+    "Parsing simple if"
+    parse_stmt
+    "if(c==1) CX q[0], q[1];"
+    (If 
+      ((Id "c")
+      ,(Nnint 1)
+      ,(Q_uop (CX
+         (A_id (Id "q", Some (Nnint 0))
+         ,A_id (Id "q", Some (Nnint 1)))))))
+
+let%test _ =
+  assert_fail
+    "Parsing if with syntax error"
+    parse_stmt
+    "if(c=1) CX q[0], q[1];"
+
+(* 
+let%test _ =
+  assert_parse_fromString
+    "Parsing comments"
+    parse_prog (* does not exist *)
+    (String.concat "\n"
+      ["// comment"
+      ;"// more comments"
+      ;"// even more comments"
+      ;"qreg x[3]"
+      ;"// more comments"])
+    (Qreg (Id "x", Nnint 3)) *)
