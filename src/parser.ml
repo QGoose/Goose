@@ -1,7 +1,6 @@
 open Opal
 open Qasm
-
-let todo () = failwith "Unimplemented"
+open Utils
 
 let id x = Id x
 let nnint x = Nnint x
@@ -14,12 +13,12 @@ let singleton_zero = exactly '0' >> return ['0']
 let parse_nnint =
   spaces
   >> (non_zero <~> many digit <|> singleton_zero)
-  => (implode % int_of_string % nnint)
+     => (implode % int_of_string % nnint)
 
 let parse_id =
   spaces
   >> letter <~> many (alpha_num <|> exactly '_')
-  => (implode % id)
+     => (implode % id)
 
 let (let*) = (>>=)
 
@@ -145,3 +144,6 @@ let parse_stmt =
 
 let parse_string s =
   LazyStream.of_string s |> parse_stmt
+
+(* TODO: public interface to parse the AST *)
+let parse_ast _ = Utils.todo ()
