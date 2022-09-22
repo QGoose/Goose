@@ -16,6 +16,6 @@ let () =
                close_in_noerr src_ic;
                raise e;) in
   let ast = Parser.parse_ast src in
-  let ir = Ir.lower_ast ast in
-  let _ = Simulation.simulate ir in
+  let circ = Circuit.lower_ast ast in
+  let _res = Simulation.simulate circ in
   print_endline "goodbye";
