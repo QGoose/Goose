@@ -1,9 +1,13 @@
-open Circuit
+type qstate = Complex.t array
 
-type qstate = unit
+let init qbits =
+  let len = 1 lsl qbits in
+  (* All-zero state *)
+  let state = Array.make len Complex.zero in
+  (* effectfully set the |00...0> entry to 1 *)
+  Array.set state 0 Complex.one;
+  state
 
-let init (_ : int) = Utils.todo ()
+let apply_gate (_ : Circuit.gate) (_ : qstate) = Utils.todo ()
 
-let apply_gate (_ : gate) (_ : qstate) = Utils.todo ()
-
-let repr (_ : qstate) = Utils.todo ()
+let repr x = x
