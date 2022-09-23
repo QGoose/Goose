@@ -1,7 +1,5 @@
 open Quantumlib
 
-module Backend = Simulation.Make (Naive_backend)
-
 let () =
   let nargs = Array.length Sys.argv in
   if nargs != 2 then
@@ -19,5 +17,5 @@ let () =
                raise e;) in
   let ast = Parser.parse_ast src in
   let circ = Compiler.compile ast in
-  let _res = Backend.run circ in
+  let _res = Naive.NaiveSimulator.run circ in
   print_endline "goodbye";
