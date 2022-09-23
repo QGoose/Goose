@@ -3,7 +3,7 @@ open Circuit
 module type BACKEND = sig
   type qstate
   val init : int -> qstate
-  
+
   val apply_gate : Circuit.gate -> qstate -> unit
 
   val repr : qstate -> Complex.t array
@@ -17,4 +17,3 @@ end = struct
     List.iter (fun g -> B.apply_gate g state) circ.gates;
     state
 end
-

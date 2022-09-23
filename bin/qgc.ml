@@ -1,5 +1,7 @@
 open Quantumlib
 
+module Backend = Simulation.Make (Naive_backend)
+
 let () =
   let nargs = Array.length Sys.argv in
   if nargs != 2 then
@@ -16,6 +18,6 @@ let () =
                close_in_noerr src_ic;
                raise e;) in
   let ast = Parser.parse_ast src in
-  let circ = Circuit.lower_ast ast in
-  let _res = Simulation.simulate circ in
+  let circ = Compiler.compile ast in
+  let _res = Backend.run circ in
   print_endline "goodbye";
