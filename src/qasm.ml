@@ -1,4 +1,4 @@
-type prog = {
+type t = {
   version : nnint * nnint;
   body : stmt list;
 }

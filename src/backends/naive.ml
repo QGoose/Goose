@@ -1,22 +1,6 @@
-open Circuit
+(** * A Naive Backend For Simulation of Quantum Circuits *)
 
-module type BACKEND = sig
-  type qstate
-  val init : int -> qstate
-  
-  val apply_gate : Circuit.gate -> qstate -> unit
-
-  val repr : qstate -> Complex.t array
-end
-
-module Make(B : BACKEND) : sig
-  val run : Circuit.t -> B.qstate
-end = struct
-  let run circ =
-    let state = B.init circ.qbits in
-    List.iter (fun g -> B.apply_gate g state) circ.gates;
-    state
-end
+open Simulation
 
 module NaiveBackend : BACKEND = struct
   type qstate = Complex.t array
@@ -34,5 +18,6 @@ module NaiveBackend : BACKEND = struct
   let repr x = x
 end
 
+(** Naive Simulator *)
 module NaiveSimulator = Make(NaiveBackend)
 

@@ -1,38 +1,46 @@
-(* Almost *certainly* not the representation we want, *)
-(* since it's strictly less expressive than the OpenQASM gates. *)
-type sq_gate_kind = X | Y | Z | T | TDag | S | SDag
+(** * Quantum Circuit Intermediate Representation
 
-type sq_gate = {
+  A simplified representation of Quantum Circuits
+*)
+
+type adr = A of int
+
+(**
+  Kind of Gates.
+  
+  For the sake of simplicitiy, we pick a small
+  set of gates that is not enough to express arbitrary
+  quantum circuits.
+*)
+type gate_kind =
+  | X (* Not Gate *)
+  | H (* Hadamard Gate *)
+  | Z (* Phase Gate *)
+  (* Rm of int *)
+
+(**
+  Generic Gates.
+
+  A gate has a target qubit and a set of set of controls
+*)
+type gate = {
   (* Target qubit address *)
-  tgt : int;
+  target : adr;
   (* Which gate do we apply? *)
-  kind : sq_gate_kind
+  kind : gate_kind;
+  controls : adr list;
 }
 
-type ctrl_gate = {
-  (* Source qubit address *)
-  src : int;
-  (* Gate applied at target *)
-  op : sq_gate;
-}
-
-(* Consider this a *sketch* of the show to tell you what it's supposed to represent. *)
-(* This might not be interface we actually want. *)
-type gate = Sq_gate of sq_gate | Ctrl_gate of ctrl_gate
-
-(* A circuit representation that's really a mildly desugared version of QASM. *)
-(* No named registers, no-op instructions, measurement, etc. *)
-(* N.b. measurement *is* syntactic sugar! *)
-(* N.b. All of these types are *sketches* to tell you what they're supposed to represent. *)
-(* They might not be the interface we really want. *)
-(* How do I do block comments in this silly language? *)
-type circuit = {
+(**
+  Circuits.
+  
+  A quantum circuit is defined
+  by its number a qubits
+  and an (ordered) list of gates
+*)
+type t = {
   (* Total number of qubits *)
   qbits : int;
-  (* Total number of cbits *)
-  cbits : int;
+  (* The actual circuit *)
   gates : gate list;
 }
-
-(* TODO: should return a `circuit` *)
-let lower_ast _ = Utils.todo ()
