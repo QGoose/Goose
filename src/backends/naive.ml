@@ -4,6 +4,7 @@ open Simulation
 
 let complex_two = Complex.{re = 2.0; im = 0.0}
 let one_over_sqrt_2 = Complex.(div one (sqrt complex_two))
+let two_pi = Complex.{re = 2.0 *. Float.pi; im = 0.0}
 
 module NaiveBackend : BACKEND with type qstate = Complex.t array = struct
   type qstate = Complex.t array
@@ -30,6 +31,7 @@ module NaiveBackend : BACKEND with type qstate = Complex.t array = struct
     | X -> Complex.(zero, one, one, zero)
     | Z -> Complex.(one, zero, zero, neg one)
     | H -> (one_over_sqrt_2, one_over_sqrt_2, one_over_sqrt_2, Complex.neg one_over_sqrt_2)
+    | Rm m -> Complex.(one, zero, zero, exp (div (mul two_pi i) (pow complex_two {re = float_of_int m; im = 0.0})))
 
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in

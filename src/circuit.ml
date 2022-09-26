@@ -16,7 +16,7 @@ type gate_kind =
   | X (* Not Gate *)
   | H (* Hadamard Gate *)
   | Z (* Phase Gate *)
-  (* Rm of int *)
+  | Rm of int
 
 (**
   Generic Gates.
