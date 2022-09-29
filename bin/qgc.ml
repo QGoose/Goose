@@ -7,15 +7,7 @@ let () =
   else
     ();
   let filename = Sys.argv.(1) in
-  let src_ic = open_in filename in
-  let src = (try
-               let src = really_input_string src_ic (in_channel_length src_ic) in
-               close_in src_ic;
-               src
-             with e ->
-               close_in_noerr src_ic;
-               raise e;) in
-  let ast = Parser.parse_ast src in
+  let ast = Parser.parse_file filename in
   let circ = Compiler.compile ast in
   let _res = Naive.NaiveSimulator.run circ in
   print_endline "goodbye";
