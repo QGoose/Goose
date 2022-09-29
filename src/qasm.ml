@@ -62,3 +62,21 @@ and unaryop =
   | EXP
   | LN
   | SQRT
+
+let string_of_id = function
+  | Id s -> s
+
+let int_of_nnint = function
+  | Nnint n -> n
+
+let string_of_stmt = function
+  | Qreg (id, n) -> Printf.sprintf "qreg %s[%d];" (string_of_id id) (int_of_nnint n)
+  | Creg (id, n) -> Printf.sprintf "creg %s[%d];" (string_of_id id) (int_of_nnint n)
+  | _ -> ""
+
+let string_of_qasm = function
+  | {version = (v1, v2); body = b} ->
+      String.concat "\n" @@ List.concat
+      [ [ Printf.sprintf "OPENQASM %d.%d;" (int_of_nnint v1) (int_of_nnint v2) ]
+      ; (List.map string_of_stmt b)
+      ; [""] ]
