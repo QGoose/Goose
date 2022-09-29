@@ -2,7 +2,7 @@
 
 open Simulation
 
-module NaiveBackend : CBACKEND = struct
+module NaiveBackend = struct
   type qstate = Complex.t array
   
   let iteration_indices (i : int) (t : int) : int * int =

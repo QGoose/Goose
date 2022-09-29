@@ -1,6 +1,10 @@
 open Symbolic
 open Simulation
-module SBackend : SBACKEND = struct
+
+(**
+  A Symbolic backend to simulate quantum circuits
+*)
+module SBackend = struct
   type qstate = Expr.t array
   
   let iteration_indices (i : int) (t : int) : int * int =
@@ -10,21 +14,13 @@ module SBackend : SBACKEND = struct
     let i2 = i1 lor (1 lsl t) in
     (i1, i2)
 
-  (* It depends on if we xant to allow custom inputs or not *)
-
-  (* If we just assume that the initial state is a vector of zeros,
-      then we just benefits of symbolic simplifications, but we don't need variables
-      Yes but you get a symbolic result (an ast) instead of a concrete complex in the end
-      so you can compile the ast to efficient c
-      instead of doing the actual complex computation at (ocaml) runtime
-  *)
-
   let init qbits =
     let len = 1 lsl qbits in
     (* All-zero state *)
-    let state = Array.make len (Expr.Cst (Complex.zero)) in
+    let state = Array.init len (fun _ -> Expr.Var (Symbol.fresh ())) in
+    (* let state = Array.make len (Expr.Cst (Complex.zero)) in *)
     (* effectfully set the |00...0> entry to 1 *)
-    Array.set state 0 (Expr.Cst (Complex.one));
+    (* Array.set state 0 (Expr.Cst (Complex.one)); *)
     state
 
   let controls_check (state_index: int) (controls: Circuit.adr list): bool =
@@ -72,5 +68,5 @@ module SBackend : SBACKEND = struct
   let repr x = x
 end
 
-(** Naive Simulator *)
+(** Symbolic Simulator *)
 module SE_Engine = Make(SBackend)
