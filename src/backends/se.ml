@@ -1,9 +1,5 @@
-(** * A Naive Backend For Simulation of Quantum Circuits *)
-
-open Simulation
-
-module NaiveBackend : BACKEND = struct
-  type qstate = Complex.t array
+(* module NaiveBackend : SBACKEND = struct
+  type qstate = Expr.t array
   
   let iteration_indices (i : int) (t : int) : int * int =
     let mask = (1 lsl t) - 1 in
@@ -66,4 +62,4 @@ end
 
 (** Naive Simulator *)
 module NaiveSimulator = Make(NaiveBackend)
-
+ *)

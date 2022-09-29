@@ -5,10 +5,12 @@ module type BACKEND = sig
   val init : int -> qstate
 
   val apply_gate : Circuit.gate -> qstate -> unit
-
-  val repr : qstate -> Complex.t array
 end
 
+module type CBACKEND = sig
+  include BACKEND
+  val repr : qstate -> Complex.t array
+end
 module Make(B : BACKEND) : sig
   val run : Circuit.t -> B.qstate
 end = struct
