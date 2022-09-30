@@ -8,7 +8,6 @@ let () =
     ();
   let filename = Sys.argv.(1) in
   let ast = Parser.parse_file filename in
-  let _ = print_string (Qasm.string_of_qasm ast) in
   let circ = Compiler.compile ast in
   let _res = Naive.NaiveSimulator.run circ in
   print_endline "goodbye";
