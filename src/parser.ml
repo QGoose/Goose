@@ -51,6 +51,7 @@ and parse_atom input =
     token "tan" >> (parens parse_expr) => (fun x -> E_uop (TAN, x));
     token "exp" >> (parens parse_expr) => (fun x -> E_uop (EXP, x));
     token "sqrt" >> (parens parse_expr) => (fun x -> E_uop (SQRT, x));
+    parse_const
    ] input
 and parse_const input =
   choice [
@@ -102,6 +103,7 @@ let parse_stmt =
     let* id = parse_id in
     let* l1 = between (token "(") (token ")") (sep_by parse_expr (token ",")) in
     let* l2 = sep_by1 parse_arg (token ",") in
+    let* _ = token ";" in
     return (App (id, l1, l2))
   in
   let uop =
@@ -136,8 +138,9 @@ let parse_stmt =
     let* _  = token "if" in
     let* _  = token "(" in
     let* id = parse_id in
-    let* _  = token ")" in
+    let* _  = token "==" in
     let* nn = parse_nnint in
+    let* _  = token ")" in
     let* op = qop in
     return (If (id, nn, op))
   in
@@ -158,11 +161,11 @@ let parse_stmt =
   choice [
     qreg;
     creg;
-    gate;
     qop => (fun x -> Qop x);
-    cond;
+    barr;
     opaq;
-    barr
+    cond;
+    gate
   ]
 
 
