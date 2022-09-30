@@ -60,6 +60,7 @@ and unaryop =
   | COS
   | TAN
   | EXP
+  | NEG
   | LN
   | SQRT
 

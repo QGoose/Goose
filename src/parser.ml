@@ -33,7 +33,31 @@ let parse_arg =
   let* nn = parse_opt_idx in
   return (A_id (id, nn))
 
-let parse_expr _ = todo ()
+let parens = between (token "(") (token ")")
+let add = token "+" >> return (fun x y -> Qasm.E_bop (ADD, x, y))
+let sub = token "-" >> return (fun x y -> Qasm.E_bop (SUB, x, y))
+let mul = token "*" >> return (fun x y -> Qasm.E_bop (MUL, x, y))
+let div = token "/" >> return (fun x y -> Qasm.E_bop (DIV, x, y))
+
+let rec parse_expr input = chainl1 parse_term (add <|> sub) input
+and parse_term input = chainl1 parse_factor (mul <|> div) input
+and parse_factor input = (parens parse_expr <|> parse_atom) input
+and parse_atom input = 
+  choice [
+    token "-" >> parse_atom => (fun x -> E_uop (NEG, x));
+    token "ln" >> (parens parse_expr) => (fun x -> E_uop (LN, x));
+    token "sin" >> (parens parse_expr) => (fun x -> E_uop (SIN, x));
+    token "cos" >> (parens parse_expr) => (fun x -> E_uop (COS, x));
+    token "tan" >> (parens parse_expr) => (fun x -> E_uop (TAN, x));
+    token "exp" >> (parens parse_expr) => (fun x -> E_uop (EXP, x));
+    token "sqrt" >> (parens parse_expr) => (fun x -> E_uop (SQRT, x));
+   ] input
+and parse_const input =
+  choice [
+    token "pi" >> return E_Pi;
+    parse_id => (fun x -> E_id x);
+    parse_nnint => (fun x -> E_int x);
+  ] input
 
 let parse_stmt =
   let qreg =
