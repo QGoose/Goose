@@ -1,6 +1,5 @@
 open Opal
 open Qasm
-open Utils
 
 let id x = Id x
 let nnint x = Nnint x
@@ -75,15 +74,7 @@ let parse_stmt =
     let* _  = token ";" in
     return (Creg (id, nn))
   in
-  let gop _ = todo ()
-  in
-  let gate =
-    let* id = parse_id in
-    let* l1 = sep_by parse_id (token ",") in
-    let* l2 = sep_by1 parse_id (token ",") in
-    let* l3 = between (token "{") (token "}") (many gop) in
-    return (GateDecl (id, l1, l2, l3))
-  in
+  
   let uop_u =
     let* _ = token "U" in
     let* l = between (token "(") (token ")") (sep_by parse_expr (token ",")) in
@@ -112,6 +103,20 @@ let parse_stmt =
       uop_cx;
       uop_app;
     ]
+  in
+  let gop =
+    choice [
+      uop => (fun x -> G_uop x);
+      token "barrier" >> (sep_by1 parse_id (token ",")) => (fun x -> G_barrier x)
+    ]
+  in
+  let gate =
+    let* _  = token "gate" in
+    let* id = parse_id in
+    let* l1 = between (token "(") (token ")") (sep_by parse_id (token ",")) in
+    let* l2 = sep_by1 parse_id (token ",") in
+    let* l3 = between (token "{") (token "}") (many gop) in
+    return (GateDecl (id, l1, l2, l3))
   in
   let measure =
     let* _ = token "measure" << space in

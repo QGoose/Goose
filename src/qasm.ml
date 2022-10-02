@@ -152,9 +152,8 @@ and string_of_stmts tab l =
   else
     String.concat "\n" l'
 
-let string_of_qasm = function
-  | {version = (v1, v2); body = b} ->
-      String.concat "\n" @@ List.concat
-      [ [ Printf.sprintf "OPENQASM %d.%d;" (int_of_nnint v1) (int_of_nnint v2) ]
-      ; (List.map string_of_stmt b)
-      ; [""] ]
+let string_of_qasm { version = (v1, v2); body } =
+  String.concat "\n" [
+    Printf.sprintf "OPENQASM %d.%d;" (int_of_nnint v1) (int_of_nnint v2);
+    string_of_list ~sep:"\n" string_of_stmt body
+  ]
