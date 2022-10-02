@@ -182,7 +182,6 @@ let parse_qasm =
 let parse_file filename =
   let src_ic = open_in filename in
   try
-    (* let src = really_input_string src_ic (in_channel_length src_ic) in *)
     let ast = Opal.parse parse_qasm (LazyStream.of_channel src_ic) in
     close_in src_ic;
     match ast with

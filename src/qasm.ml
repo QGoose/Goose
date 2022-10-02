@@ -70,10 +70,87 @@ let string_of_id = function
 let int_of_nnint = function
   | Nnint n -> n
 
-let string_of_stmt = function
+let string_of_list ?(sep = ", ") (str : 'a -> string) (l : 'a list) =
+  String.concat sep (List.map str l)
+
+let rec string_of_stmt = function
   | Qreg (id, n) -> Printf.sprintf "qreg %s[%d];" (string_of_id id) (int_of_nnint n)
   | Creg (id, n) -> Printf.sprintf "creg %s[%d];" (string_of_id id) (int_of_nnint n)
-  | _ -> ""
+  | GateDecl (Id name, args1, args2, body) ->
+    Printf.sprintf "%s (%s) %s {\n%s\n}" name
+      (string_of_ids args1) (string_of_ids args2)
+      (string_of_list ~sep:", " string_of_gop body)
+  | Qop q -> string_of_qop q
+  | _ -> Utils.todo ()
+
+and string_of_qop (q : qop) =
+  match q with
+  | Q_uop u -> string_of_uop u
+  | Q_measure (arg1, arg2) ->
+    Printf.sprintf "measure %s, %s;" (string_of_arg arg1) (string_of_arg arg2)
+  | Q_reset arg ->
+    Printf.sprintf "reset %s;" (string_of_arg arg)
+
+and string_of_uop (u : uop) =
+  match u with
+  | U (l, arg) ->
+    Printf.sprintf "U (%s) %s;" (String.concat ", " (List.map string_of_expr l)) (string_of_arg arg)
+  | CX (arg1, arg2) ->
+    Printf.sprintf "CX %s, %s;" (string_of_arg arg1) (string_of_arg arg2)
+  | App (Id name, exprs, args) ->
+    Printf.sprintf "%s (%s) %s;" name
+      (string_of_list string_of_expr exprs)
+      (string_of_list string_of_arg args)
+
+and string_of_gop (g : gop) =
+  match g with
+  | G_uop u -> string_of_uop u
+  | G_barrier l -> Printf.sprintf "barrier %s;" (string_of_ids l)
+
+and string_of_expr (e : expr) =
+  match e with
+  | E_cst f -> string_of_float f
+  | E_int (Nnint i) -> string_of_int i
+  | E_Pi -> "pi"
+  | E_id (Id id) -> id
+  | E_bop (op, e1, e2) ->
+    Printf.sprintf "(%s %s %s)" (string_of_binary op) (string_of_expr e1) (string_of_expr e2)
+  | E_uop (op, e) ->
+    Printf.sprintf "%s(%s)" (string_of_unary op) (string_of_expr e)
+
+and string_of_unary op =
+  match op with
+  | SIN -> "sin"
+  | COS -> "cos"
+  | TAN -> "tan"
+  | EXP -> "exp"
+  | NEG -> "-"
+  | LN -> "ln"
+  | SQRT -> "sqrt"
+
+and string_of_binary op =
+  match op with
+  | ADD -> "+"
+  | MUL -> "*"
+  | SUB -> "-"
+  | DIV -> "/"
+  | POW -> "^"
+
+and string_of_arg (A_id (Id id, idx)) =
+  match idx with
+  | None -> id
+  | Some (Nnint i) -> Printf.sprintf "%s[%d]" id i
+
+
+and string_of_ids l =
+    String.concat ", " (List.map (fun (Id x) -> x) l)
+
+and string_of_stmts tab l =
+  let l' = List.map string_of_stmt l in
+  if tab then
+    String.concat "\n" (List.map ((^) "  ") l')
+  else
+    String.concat "\n" l'
 
 let string_of_qasm = function
   | {version = (v1, v2); body = b} ->
