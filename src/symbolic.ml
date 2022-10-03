@@ -1,3 +1,5 @@
+(** {1 Symbolic Computations} *)
+
 module Symbol : sig
   type t
   val fresh : unit -> t
@@ -24,7 +26,6 @@ module Expr = struct
   let ( *! ) x y = Mul (x, y)
   
   let ( +! ) x y = Add (x, y)
-  
 
   let neg x = Neg x
   
@@ -37,12 +38,7 @@ module Expr = struct
     | Neg e ->
       Printf.sprintf "(neg %s)" (repr e)
     | Cst c ->
-      Printf.sprintf "%f + i%f" c.re c.im
+      Printf.sprintf "(%f + i%f)" c.re c.im
     | Var v ->
       Printf.sprintf "%s" (Symbol.repr v)
-end
-
-module type SBACKEND = sig
-  include Simulation.BACKEND
-  val repr : qstate -> Expr.t array
 end

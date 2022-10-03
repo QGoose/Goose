@@ -1,16 +1,16 @@
 % easychair.tex,v 3.5 2017/03/15
 
-\documentclass{easychair}
-\usepackage{amsfonts}
-%\documentclass[EPiC]{easychair}
-%\documentclass[EPiCempty]{easychair}
-%\documentclass[debug]{easychair}
-%\documentclass[verbose]{easychair}
-%\documentclass[notimes]{easychair}
-%\documentclass[withtimes]{easychair}
-%\documentclass[a4paper]{easychair}
-%\documentclass[letterpaper]{easychair}
+% \documentclass{easychair}
+% \documentclass[EPiC]{easychair}
+% \documentclass[EPiCempty]{easychair}
+% \documentclass[debug]{easychair}
+% \documentclass[verbose]{easychair}
+% \documentclass[notimes]{easychair}
+% \documentclass[withtimes]{easychair}
+\documentclass[a4paper]{easychair}
+% \documentclass[letterpaper]{easychair}
 
+\usepackage{amsfonts}
 \usepackage{listings}
 \usepackage[skip=0pt]{caption}
 \usepackage[T1]{fontenc}
@@ -22,44 +22,60 @@
 
 \newmintinline{OCaml}{}
 
-\title{Goose: An OCaml environnement to simulate quantum programs}
+\title{Goose: an OCaml environment for quantum computing}
 
 \author{
   Denis Carnier\inst{1}
   \and
   Arthur Correnson\inst{2}
   \and
-  Chris McNally\inst{3}
+  Christopher McNally\inst{3}
   \and
   Youssef Moawad\inst{4}
 }
 
 \institute{
-  ENS de Rennes
+  imec-DistriNet, KU Leuven
 \and
-  MIT
+  Ecole Normale Sup\'erieure de Rennes
+\and
+  Massachusetts Institute of Technology
 \and
   University of Glasgow
-\and
-  imec-DistriNet, KU Leuven
 }
 
-\authorrunning{A. Correnson, F. Bobot}
+\authorrunning{Carnier, Correnson, McNally, and Moawad}
 
-\titlerunning{Quantum programs in OCaml}
+\titlerunning{Goose: an OCaml environment for quantum computing}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-  A quantum Abstract
+Quantum computing is an emerging model of computation that exploits non-classical effects like superposition and entanglement to achieve algorithmic speedups. A radical break from classical computation, the model presents new challenges for programming languages research. In this presentation, we showcase Goose: an OCaml library to model, simulate and compile low-level quantum programs. Goose is designed to support research into quantum programming languages through an emphasis on ease of use and extensibility. The library is compatible with the OpenQASM standard, and targets a variety of backends with a minimalistic circuit-based IR.
 \end{abstract}
 
 %------------------------------------------------------------------------------
 \section{Introduction}
 
-A quantum intro
+Quantum computing is an emerging model of computation that exploits non-classical effects like superposition and entanglement to achieve algorithmic speedups. Despite recent advances in hardware implementation of quantum computers, widespread access remains limited.
+\begin{itemize}
+\item Hardware is scarce
+\item Hardware doesn't work well
+\item Libraries/frameworks are all in weakly-typed Python (cf. Qiskit, Cirq)
+\item we should push the PL angle more
+\item Connecting IRs (never mind high-level languages) to the stuff you see in books: how? May not be obvious.
+\end{itemize}
+
+However, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system. While we remain in the NISQ (Noisy Intermediate Scale Quantum) era of quantum computing, such systems are quite prone to errors and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity. Simulation on classical computers allows researchers to study novel quantum algorithms without such restrictions and with no errors. In addition, they are able to artificially emulate errors to “see” the behaviour of their algorithms when running on real current-day quantum computers.
+
+For this reason, programming language researchers need accessible tools for compilation and classical simulation of quantum programs.
+
+In this presentation, we showcase Goose: an extensible library to model, simulate and compile quantum programs.
+
+that lays the foundation for further quantum programming languages research in the OCaml ecosystem. Goose is a low-level compilation framework that … [multiple input representations] … [multiple backends]
+
 
 \section{Conclusion and Future Work}
 
