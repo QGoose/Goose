@@ -5,7 +5,6 @@
 
 Require Import Reals ZArith List.
 
-
 Inductive adr : Type := Adr (_ : nat).
 
 (**

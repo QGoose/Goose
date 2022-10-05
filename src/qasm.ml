@@ -63,6 +63,7 @@ and unaryop =
   | NEG
   | LN
   | SQRT
+  | INV
 
 let string_of_id = function
   | Id s -> s
@@ -124,9 +125,10 @@ and string_of_unary op =
   | COS -> "cos"
   | TAN -> "tan"
   | EXP -> "exp"
-  | NEG -> "-"
+  | NEG -> "neg"
   | LN -> "ln"
   | SQRT -> "sqrt"
+  | INV -> "inv"
 
 and string_of_binary op =
   match op with

@@ -29,25 +29,25 @@ module SBackend = struct
 
   type matrix = Expr.t * Expr.t * Expr.t * Expr.t
 
-  let cpx_2 =
-    Complex.{ re = 2.0; im = 0.0 }
-
   let cpx_inv_sqrt_2 =
-    Complex.(div one (sqrt cpx_2))
+    Expr.Uop (INV, Uop (SQRT, Cst 2))
 
   let cpx_2_pi =
-    Complex.{ re = 2.0 *. Float.pi; im = 0.0 }
+    Expr.(Cst 2 *! Pi)
 
   let cpx_pow_2 m =
-    Complex.(pow cpx_2 { re = float_of_int m; im = 0.0 })
+    Expr.Bop (POW, Cst 2, Cst m)
+
+  let cpx_omega m =
+    Expr.(Uop (EXP, Bop (DIV, cpx_2_pi *! I, cpx_pow_2 m)))
 
     
   let matrix_for_gate (g : Circuit.gate_kind) : matrix =
     match g with
-    | X -> Expr.(Complex.(Cst zero, Cst one, Cst one, Cst zero))
-    | Z -> Expr.(Complex.(Cst one, Cst zero, Cst zero, Cst (neg one)))
-    | H -> Expr.(Complex.(Cst cpx_inv_sqrt_2, Cst cpx_inv_sqrt_2, Cst cpx_inv_sqrt_2, Cst (neg cpx_inv_sqrt_2)))
-    | Rm m -> Expr.(Complex.(Cst one, Cst zero, Cst zero, Cst (exp (div (mul cpx_2_pi i) (cpx_pow_2 m)))))
+    | X -> Expr.(Cst 0, Cst 1, Cst 1, Cst 0)
+    | Z -> Expr.(Cst 1, Cst 0, Cst 0, Cst (-1))
+    | H -> Expr.(cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, neg cpx_inv_sqrt_2)
+    | Rm m -> Expr.(Cst 0, Cst 0, Cst 0, cpx_omega m)
 
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in

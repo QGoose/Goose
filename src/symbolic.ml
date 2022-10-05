@@ -17,28 +17,29 @@ end
 
 module Expr = struct
   type t =
-    | Add of t * t
-    | Mul of t * t
-    | Neg of t
-    | Cst of Complex.t
+    | Bop of Qasm.binaryop * t * t
+    | Uop of Qasm.unaryop * t
+    | Cst of int
+    | Pi
+    | I
     | Var of Symbol.t
 
-  let ( *! ) x y = Mul (x, y)
+  let ( *! ) x y = Bop (Qasm.MUL, x, y)
   
-  let ( +! ) x y = Add (x, y)
+  let ( +! ) x y = Bop (Qasm.ADD, x, y)
 
-  let neg x = Neg x
+  let neg x = Uop (Qasm.NEG, x)
   
   let rec repr (e : t) =
     match e with
-    | Add (e1, e2) ->
-      Printf.sprintf "(add %s %s)" (repr e1) (repr e2)
-    | Mul (e1, e2) ->
-      Printf.sprintf "(mul %s %s)" (repr e1) (repr e2)
-    | Neg e ->
-      Printf.sprintf "(neg %s)" (repr e)
+    | Bop (op, e1, e2) ->
+      Printf.sprintf "(%s %s %s)" (Qasm.string_of_binary op) (repr e1) (repr e2)
+    | Uop (op, e) ->
+      Printf.sprintf "(%s %s)" (Qasm.string_of_unary op) (repr e)
     | Cst c ->
-      Printf.sprintf "(%f + i%f)" c.re c.im
+      Printf.sprintf "%d" c
+    | Pi -> Printf.sprintf "pi"
+    | I -> Printf.sprintf "i"
     | Var v ->
       Printf.sprintf "%s" (Symbol.repr v)
 end
