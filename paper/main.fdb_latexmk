@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex main"] 1665155335 "main.aux" "main.bbl" "main" 1665156671
+["bibtex main"] 1665155335 "main.aux" "main.bbl" "main" 1665157594
   "/usr/local/texlive/2021/texmf-dist/bibtex/bib/msc/biblio.bib" 1136766823 1785 a8388404d3deab9d4205ecd2eb65bfde ""
   "/usr/local/texlive/2021/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1665156467 1118 5033b917caf793f696fc32e9a5ca8a70 "pdflatex"
+  "main.aux" 1665156722 1118 5033b917caf793f696fc32e9a5ca8a70 "pdflatex"
   (generated)
-  "main.bbl"
   "main.blg"
-["pdflatex"] 1665156465 "/Users/arthur/Documents/github/QuantumGoose/paper/main.tex" "/Users/arthur/Documents/github/QuantumGoose/paper/main.pdf" "main" 1665156671
-  "/Users/arthur/Documents/github/QuantumGoose/paper/main.aux" 1665156467 1118 5033b917caf793f696fc32e9a5ca8a70 ""
-  "/Users/arthur/Documents/github/QuantumGoose/paper/main.tex" 1665156671 5836 de7a797af83dc8ef10da24ffe64e8f04 ""
-  "/dev/null" 1665156623 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "main.bbl"
+["pdflatex"] 1665156720 "/Users/arthur/Documents/github/QuantumGoose/paper/main.tex" "/Users/arthur/Documents/github/QuantumGoose/paper/main.pdf" "main" 1665157594
+  "/Users/arthur/Documents/github/QuantumGoose/paper/main.aux" 1665156722 1118 5033b917caf793f696fc32e9a5ca8a70 ""
+  "/Users/arthur/Documents/github/QuantumGoose/paper/main.tex" 1665157594 6021 aa52a4bff3d0251425e563525ffbf3f1 ""
+  "/dev/null" 1665157589 0 d41d8cd98f00b204e9800998ecf8427e ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -228,14 +228,14 @@
   "/usr/local/texlive/2021/texmf-var/web2c/pdftex/pdflatex.fmt" 1631174516 2724743 96cb2c414fa0ce7d1c990df34d9551bc ""
   "/usr/local/texlive/2021/texmf.cnf" 1616695596 577 4c1911a7228e554c6032256d3cf5567d ""
   "easychair.cls" 1632759513 22243 f1c095d2b567c4f560c7cd435809e3d7 ""
-  "main.aux" 1665156467 1118 5033b917caf793f696fc32e9a5ca8a70 "pdflatex"
+  "main.aux" 1665156722 1118 5033b917caf793f696fc32e9a5ca8a70 "pdflatex"
   "main.bbl" 1665155336 49 0eba253fc001332e731e8aba3f23127b "bibtex main"
-  "main.out" 1665156467 237 1bc72aa7bf0dd066c3835e54f95269d8 "pdflatex"
-  "main.tex" 1665156671 5836 de7a797af83dc8ef10da24ffe64e8f04 ""
+  "main.out" 1665156722 237 1bc72aa7bf0dd066c3835e54f95269d8 "pdflatex"
+  "main.tex" 1665157594 6021 aa52a4bff3d0251425e563525ffbf3f1 ""
   (generated)
-  "/Users/arthur/Documents/github/QuantumGoose/paper/main.pdf"
-  "main.out"
-  "/Users/arthur/Documents/github/QuantumGoose/paper/main.log"
-  "main.log"
   "main.aux"
   "main.pdf"
+  "main.log"
+  "main.out"
+  "/Users/arthur/Documents/github/QuantumGoose/paper/main.pdf"
+  "/Users/arthur/Documents/github/QuantumGoose/paper/main.log"
