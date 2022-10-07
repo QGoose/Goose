@@ -68,7 +68,7 @@ Quantum computing is an emerging model of computation that exploits non-classica
 \item Connecting IRs (never mind high-level languages) to the stuff you see in books: how? May not be obvious.
 \end{itemize}
 
-However, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system. While we remain in the NISQ (Noisy Intermediate Scale Quantum) era of quantum computing, such systems are quite prone to errors and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity. Simulation on classical computers allows researchers to study novel quantum algorithms without such restrictions and with no errors. In addition, they are able to artificially emulate errors to “see” the behaviour of their algorithms when running on real current-day quantum computers.
+However, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system. While we remain in the NISQ (Noisy Intermediate Scale Quantum) era of quantum computing, such systems are quite prone to errors and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qbit connectivity. Simulation on classical computers allows researchers to study novel quantum algorithms without such restrictions and with no errors. In addition, they are able to artificially emulate errors to “see” the behaviour of their algorithms when running on real current-day quantum computers.
 
 For this reason, programming language researchers need accessible tools for compilation and classical simulation of quantum programs.
 
@@ -76,10 +76,17 @@ In this presentation, we showcase Goose: an extensible library to model, simulat
 
 that lays the foundation for further quantum programming languages research in the OCaml ecosystem. Goose is a low-level compilation framework that … [multiple input representations] … [multiple backends]
 
+\section{The Goose Library}
 
-\section{Conclusion and Future Work}
+\paragraph*{What is Goose} Goose is a friendly OCaml library for Quantum Computing. In its core, it features a simple intermediate representation to model quantum circuits. The library is built around this IR and provides a modular API to build and customize new tools such as simulators, compilers or static-analyzers for quantum programs.
 
-Quantum future worlds
+\paragraph*{Why ?} Quantum Computing is not accessible to a wide audience. This can be explained by several factors. (1) Maths/Physics are scary, (2) Quantum Computers aren't accessible to non- experts, (3) Computer Science in itself is perceived as hard.
+Recent projects \cite{} tried to overcome these limitations by developing more resources to make Quantum Computing more accessible to computer scientists. Goose follows the same track and try to provide a well-documented playground to start experimenting with the science of Quantum Computing and the activity of quantum programming. By choosing OCaml as an implementation language, we also hope to create interesting connections with the functional programming language community.
+
+\paragraph*{Goose's present and future} Goose is completely open source and freely available at the address \url{}.
+Currently, Goose supports OpenQASM as a front-end, the \textit{de facto} standard for interoperability between quantum computing tools. It also accepts a friendlier textual circuit descriptions. Goose also implements a customizable simulator for quantum circuits. To demonstrate the benefits of the modular design, we derive a symbolic simulator and a C compiler from the circuit simulator. These tools are distributed as a part of the library.
+
+In the future, we could leverage Goose's modularity to connect goose with other existing projects such as VOQC, a formally verified compiler for quantum circuits that can be extracted to OCaml.
 
 \bibliographystyle{plain}
 \bibliography{biblio}
