@@ -59,16 +59,20 @@ Quantum computing is an emerging model of computation that exploits non-classica
 %------------------------------------------------------------------------------
 \section{Introduction}
 
-Quantum computing is an emerging model of computation that exploits non-classical effects like superposition and entanglement to achieve algorithmic speedups. Despite recent advances in hardware implementation of quantum computers, widespread access remains limited.
 \begin{itemize}
-\item Hardware is scarce
-\item Hardware doesn't work well
+\item Hardware is scarce, Hardware doesn't work well
 \item Libraries/frameworks are all in weakly-typed Python (cf. Qiskit, Cirq)
 \item we should push the PL angle more
 \item Connecting IRs (never mind high-level languages) to the stuff you see in books: how? May not be obvious.
+\item challenges: accessibility, tooling needed, hardware errors and correctness matters
 \end{itemize}
 
-However, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system. While we remain in the NISQ (Noisy Intermediate Scale Quantum) era of quantum computing, such systems are quite prone to errors and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity. Simulation on classical computers allows researchers to study novel quantum algorithms without such restrictions and with no errors. In addition, they are able to artificially emulate errors to “see” the behaviour of their algorithms when running on real current-day quantum computers.
+\newcommand{\nisq}[0]{NISQ}
+
+% As an alternative, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system.
+Quantum computing is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups. Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the current Noisy Intermediate Scale Quantum (\nisq) era systems are error-prone and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity. 
+
+As an alternative to physical quantum computers, simulation on classical computers allows researchers to study quantum algorithms without such restrictions and with predictable errors. Additionally, simulators enable researchers to artificially emulate errors to predict the behaviour of their algorithms on \nisq era quantum computers.
 
 For this reason, programming language researchers need accessible tools for compilation and classical simulation of quantum programs.
 
