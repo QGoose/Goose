@@ -2,47 +2,47 @@ This is BibTeX, Version 0.99d (TeX Live 2021)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 The style file: plain.bst
-I found no \citation commands---while reading file main.aux
 Database file #1: biblio.bib
-You've used 0 entries,
+Warning--to sort, need author or key in Qiskit
+You've used 4 entries,
             2118 wiz_defined-function locations,
-            497 strings with 3987 characters,
-and the built_in function-call counts, 18 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 2
-:= -- 7
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
+            525 strings with 5151 characters,
+and the built_in function-call counts, 1866 in all, are:
+= -- 166
+> -- 140
+< -- 2
++ -- 56
+- -- 52
+* -- 162
+:= -- 312
+add.period$ -- 12
+call.type$ -- 4
+change.case$ -- 38
 chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 1
-format.name$ -- 0
-if$ -- 1
+cite$ -- 5
+duplicate$ -- 58
+empty$ -- 113
+format.name$ -- 52
+if$ -- 381
 int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 3
-num.names$ -- 0
-pop$ -- 0
+int.to.str$ -- 4
+missing$ -- 3
+newline$ -- 21
+num.names$ -- 6
+pop$ -- 42
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 34
 quote$ -- 0
-skip$ -- 1
+skip$ -- 45
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
-text.length$ -- 0
+substring$ -- 60
+swap$ -- 16
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
-warning$ -- 0
-while$ -- 0
-width$ -- 0
-write$ -- 2
-(There was 1 error message)
+type$ -- 16
+warning$ -- 1
+while$ -- 11
+width$ -- 5
+write$ -- 46
+(There was 1 warning)

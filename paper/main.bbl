@@ -1,3 +1,31 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{1}
+
+\bibitem{Qiskit}
+Qiskit: An open-source framework for quantum computing.
+
+\bibitem{Cross2022}
+Andrew~W. Cross, Ali Javadi-Abhari, Thomas Alexander, Niel de~Beaudrap, Lev~S.
+  Bishop, Steven Heidel, Colm~A. Ryan, Prasahnt Sivarajah, John Smolin, Jay~M.
+  Gambetta, and Blake~R. Johnson.
+\newblock Openqasm 3: A broader and deeper quantum assembly language.
+\newblock {\em ACM Transactions on Quantum Computing}, 3(3):12, September 2022.
+
+\bibitem{Green2013}
+Alexander~S. Green, Peter~LeFanu Lumsdaine, Neil~J. Ross, Peter Selinger, and
+  Beno{\^i}t Valiron.
+\newblock Quipper: {{A Scalable Quantum Programming Language}}.
+\newblock In {\em Proceedings of the 34th ACM SIGPLAN Conference on Programming
+  Language Design and Implementation}, {{PLDI}} '13, pages 333--342, {New York,
+  NY, USA}, June 2013. {Association for Computing Machinery}.
+
+\bibitem{Svore2018}
+Krysta~M. Svore, Alan Geller, Matthias Troyer, John Azariah, Christopher~E.
+  Granade, Bettina Heim, Vadym Kliuchnikov, Mariia Mykhailova, Andres Paz, and
+  Martin Roetteler.
+\newblock Q\#: {{Enabling Scalable Quantum Computing}} and {{Development}} with
+  a {{High}}-level {{DSL}}.
+\newblock In {\em Proceedings of the Real World Domain Specific Languages
+  Workshop 2018}, {{RWDSL}} '18, page~7, {New York, NY, USA}, February 2018.
+  {Association for Computing Machinery}.
 
 \end{thebibliography}
