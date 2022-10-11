@@ -31,3 +31,12 @@ _opam/
 **/.DS_Store
 
 .vscode
+
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.aux
+*.gz
