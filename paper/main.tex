@@ -84,9 +84,9 @@ that lays the foundation for further quantum programming languages research in t
 
 The past decade has seen the development of several Quantum Programming Languages (QPLs). These languages are designed to be used by researchers to write quantum programs that can be executed on a variety of backends. 
 
-OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing.  We support a subset of OpenQASM in our parser.
+OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing.  We support a subset of OpenQASM in our parser. Qiskit \cite{Qiskit} is a python-based toolchain and eDSL for specifying and compiling quantum circuits for simulation and deployment on quantum hardware. Other tools and QPLs include Cirq \cite{Cirq2018}, Quil \cite{Quil2016}, and Silq \cite{Bichsel2020}. A number of Functional QPLs have also been developed, including Quipper \cite{Green2013}, written in Haskell, VOQC \cite{Hietala2021}, in Coq, and Q\# \cite{Svore2018}, in F\#. We are contributing to this ecosystem with the development of a toolchain with similar functionality in OCaml.
 
-Qiskit is a python-based toolchain
+To our knowledge there are no other OCaml libraries for quantum programming being maintained. The OCaml ecosystem is well-suited to the development of such a library, as it provides a rich set of libraries for numerical computation, and a powerful type system that can be used to ensure correctness of quantum programs.
 
 \section{The Goose Library}
 
