@@ -70,7 +70,7 @@ Quantum computing is an emerging model of computation that exploits non-classica
 \newcommand{\nisq}[0]{NISQ}
 
 % As an alternative, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system.
-Quantum computing is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups. A thorough treatment and introduction to Quantum Computing can be found in \cite{}. Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the current Noisy Intermediate Scale Quantum (\nisq) \cite{} era systems are error-prone and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity \cite{}.
+Quantum computing is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups. A thorough treatment and introduction to Quantum Computing can be found in \cite{Chuang2010}. Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the current Noisy Intermediate Scale Quantum (\nisq) \cite{Preskill2018} era systems are error-prone and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity \cite{Gyongyosi2019}.
 
 As an alternative to physical quantum computers, simulation on classical computers allows researchers to study quantum algorithms without such restrictions and with predictable errors. Additionally, simulators enable researchers to artificially emulate errors to predict the behaviour of their algorithms on \nisq era quantum computers.
 
@@ -82,9 +82,11 @@ that lays the foundation for further quantum programming languages research in t
 
 \paragraph*{Related Work}
 
-OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing. It is a low-level language that is intended to be used by researchers to write quantum programs that can be executed on a variety of backends. We support a subset of OpenQASM in our parser.
+The past decade has seen the development of several Quantum Programming Languages (QPLs). These languages are designed to be used by researchers to write quantum programs that can be executed on a variety of backends. 
 
-The past decade has seen the development of several Quantum Programming Languages (QPLs). These languages are designed to be used by researchers to write quantum programs that can be executed on a variety of backends. Some of the most used languages include Qiskit \cite{Qiskit}, Quipper \cite{Green2013}, and Q\# \cite{Svore2018}.
+OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing.  We support a subset of OpenQASM in our parser.
+
+Qiskit is a python-based toolchain
 
 \section{The Goose Library}
 
