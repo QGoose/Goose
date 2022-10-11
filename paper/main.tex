@@ -59,32 +59,21 @@ Quantum computing is an emerging model of computation that exploits non-classica
 %------------------------------------------------------------------------------
 \section{Introduction}
 
-\begin{itemize}
-\item Hardware is scarce, Hardware doesn't work well
-\item Libraries/frameworks are all in weakly-typed Python (cf. Qiskit, Cirq)
-\item we should push the PL angle more
-\item Connecting IRs (never mind high-level languages) to the stuff you see in books: how? May not be obvious.
-\item challenges: accessibility, tooling needed, hardware errors and correctness matters
-\end{itemize}
+\paragraph*{Context}
 
-\newcommand{\nisq}[0]{NISQ}
+Quantum computing \cite{Chuang2010} is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups. Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the current quantum systems that are available (Noisy Intermediate Scale Quantum (NISQ) era systems \cite{Preskill2018}) are error-prone and can only maintain their coherence for a limited time. In addition, they typically do not have enough ressources (quantum-bits or qbits) to run meaningful algorithms and there may be further restrictions in terms of allowed operations \cite{Gyongyosi2019}.
 
-% As an alternative, simulation on classical hardware provides researchers the opportunity to explore novel quantum algorithms without access to a real quantum system.
-Quantum computing is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups. A thorough treatment and introduction to Quantum Computing can be found in \cite{Chuang2010}. Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the current Noisy Intermediate Scale Quantum (\nisq) \cite{Preskill2018} era systems are error-prone and can only maintain their coherence for a limited time. In addition, they typically do not have enough qubits to run meaningful algorithms and there may be further restrictions in terms of allowed gates and qubit connectivity \cite{Gyongyosi2019}.
+As an alternative to physical quantum computers, simulation on classical computers allows researchers to study quantum algorithms without such restrictions and with predictable errors. Additionally, simulators enable researchers to artificially emulate errors to predict the behaviour of their algorithms on NISQ era quantum computers.
 
-As an alternative to physical quantum computers, simulation on classical computers allows researchers to study quantum algorithms without such restrictions and with predictable errors. Additionally, simulators enable researchers to artificially emulate errors to predict the behaviour of their algorithms on \nisq era quantum computers.
+Running and simulating quantum-algorithms is only one half of the big picture. The other half is to try and find expressive ways to actually design and program quantum-algorithms. This presents new challenges for programming language researchers. For this reason, the programming language community needs accessible tools for compilation and classical simulation of quantum programs.
 
-For this reason, programming language researchers need accessible tools for compilation and classical simulation of quantum programs.
-
-In this presentation, we showcase Goose: an extensible library to model, simulate and compile quantum programs.
-
-that lays the foundation for further quantum programming languages research in the OCaml ecosystem. Goose is a low-level compilation framework that … [multiple input representations] … [multiple backends]
+In this presentation, we showcase Goose: an OCaml library to model, simulate and compile quantum programs. This library is designed to act as a playground to experiment with quantum programming in the OCaml ecosystem.
 
 \paragraph*{Related Work}
 
 The past decade has seen the development of several Quantum Programming Languages (QPLs). These languages are designed to be used by researchers to write quantum programs that can be executed on a variety of backends. 
 
-OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing.  We support a subset of OpenQASM in our parser.
+OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing. We support a subset of OpenQASM in our parser.
 
 Qiskit is a python-based toolchain
 
