@@ -127,8 +127,8 @@ and string_of_unary op =
   | EXP -> "exp"
   | NEG -> "neg"
   | LN -> "ln"
-  | SQRT -> "sqrt"
-  | INV -> "inv"
+  | SQRT -> "√"
+  | INV -> "1/"
 
 and string_of_binary op =
   match op with

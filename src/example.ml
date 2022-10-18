@@ -1,5 +1,6 @@
 open Circuit
 open Naive
+open Se
 
 let superposition n = {qbits = n; gates = List.init n (fun i -> {target = (A i); kind = H; controls = []})}
 
@@ -17,5 +18,5 @@ let qft = {
 let superpos_res = NaiveSimulator.run (superposition 10)
 let entanglement_res = NaiveSimulator.run (entanglement 3)
 
-
+let entanglement_se_res = SE_Engine.run (entanglement 3)
 
