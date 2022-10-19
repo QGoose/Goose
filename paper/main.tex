@@ -19,10 +19,18 @@
 \usepackage{soul}
 \usepackage{minted}
 \usepackage{tikz}
+\usepackage{todonotes}
 
 \newmintinline{OCaml}{}
 
-\title{Goose: an OCaml environment for quantum computing}
+\newcommand{\definition}[1]{\textit{#1}}
+\newcommand{\projname}{\textsc{Goose}}
+\newcommand{\projurl}{\url{https://www.sillygoose.fr}}
+
+% Personal TODO notes
+\newcommand{\todoCM}[1]{\todo[color=green!40,size=\footnotesize]{\textsf{CM}: #1}}
+
+\title{\projname{}: an OCaml environment for quantum computing}
 
 \author{
   Denis Carnier\inst{1}
@@ -46,14 +54,14 @@
 
 \authorrunning{Carnier, Correnson, McNally, and Moawad}
 
-\titlerunning{Goose: an OCaml environment for quantum computing}
+\titlerunning{\projname{}: an OCaml environment for quantum computing}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-Quantum computing is an emerging model of computation that exploits non-classical effects like superposition and entanglement to achieve algorithmic speedups. A radical break from classical computation, the model presents new challenges for programming languages research. In this presentation, we showcase Goose: an OCaml library to model, simulate and compile low-level quantum programs. Goose is designed to support research into quantum programming languages through an emphasis on ease of use and extensibility. The library is compatible with the OpenQASM standard, and targets a variety of backends with a minimalistic circuit-based IR.
+Quantum computing is an emerging model of computation that exploits non-classical effects like superposition and entanglement to achieve algorithmic speedups. A radical break from classical computation, the model presents new challenges for programming languages research. In this presentation, we showcase \projname{}: an OCaml library to model, simulate and compile low-level quantum programs. \projname{} is designed to support research into quantum programming languages through an emphasis on ease of use and extensibility. The library is compatible with the OpenQASM standard, and targets a variety of backends with a minimalistic circuit-based IR.
 \end{abstract}
 
 %------------------------------------------------------------------------------
@@ -61,31 +69,35 @@ Quantum computing is an emerging model of computation that exploits non-classica
 
 \paragraph*{Context}
 
-Quantum computing \cite{Chuang2010} is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups. Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the current quantum systems that are available (Noisy Intermediate Scale Quantum (NISQ) era systems \cite{Preskill2018}) are error-prone and can only maintain their coherence for a limited time. In addition, they typically do not have enough ressources (quantum-bits or qbits) to run meaningful algorithms and there may be further restrictions in terms of allowed operations \cite{Gyongyosi2019}.
+% quantum computing~\cite{Chuang2010} is an emerging model of computation that exploits non-classical physical effects like superposition and entanglement to achieve algorithmic speedups.
+\definition{Quantum computing}~\cite{Chuang2010} ...  Despite these performance promises and recent advances in the hardware implementation of quantum computers, widespread access remains limited. Furthermore, the noisy, intermediate-scale quantum (NISQ~\cite{Preskill}) quantum systems available today are error-prone and can only maintain their coherence \todoCM{What is coherence? Will readers know?} for a limited time. In addition, they typically do not have enough resources (\definition{qubits}, or quantum bits) to run meaningful \todoCM{What does `meaningful' mean?} algorithms and there may be further restrictions \todoCM{such as?} in terms of allowed operations~\cite{Gyongyosi2019}.
 
-As an alternative to physical quantum computers, simulation on classical computers allows researchers to study quantum algorithms without such restrictions and with predictable errors. Additionally, simulators enable researchers to artificially emulate errors to predict the behaviour of their algorithms on NISQ era quantum computers. Running and simulating quantum-algorithms is only one half of the big picture. The other half is to try and find expressive ways to actually design and program quantum-algorithms. This presents new challenges for programming language researchers. For this reason, the programming language community needs accessible tools for compilation and classical simulation of quantum programs.
+As an alternative to physical quantum computers, simulation on classical computers allows researchers to study quantum algorithms without such restrictions and with predictable errors\todoCM{We didn't talk about the \emph{unpredictability} of errors above.}. Additionally, simulators enable researchers to artificially simulate errors to predict the behaviour of their algorithms on NISQ-era quantum computers \todoCM{What is the tradeoff for classical simulation? Will it be obvious?}. Running and simulating quantum algorithms is only one half of the big picture. The other half is to try and find expressive ways to design and program quantum algorithms. This presents new challenges for programming language researchers. For this reason, the programming language community needs accessible tools for compilation and classical simulation of quantum programs.
 
-In this presentation, we showcase Goose: an OCaml library to model, simulate and compile quantum programs. This library is designed to act as a playground to experiment with quantum programming in the OCaml ecosystem.
+In this presentation, we showcase \projname{}: an OCaml library to model, simulate and compile quantum programs. This library is designed to act as a playground to experiment with quantum programming in the OCaml ecosystem.
 
 \paragraph*{Related Work}
 
-The past decade has seen the development of several Quantum Programming Languages (QPLs). These languages are designed to be used by researchers to write quantum programs that can be executed on a variety of backends. 
+The past decade has seen the development of several quantum Programming Languages (QPLs). These languages are designed to be used by researchers to write quantum programs that can be executed on a variety of backends.
 
-OpenQASM \cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing.  We support a subset of OpenQASM in our parser. Qiskit \cite{Qiskit} is a python-based toolchain and eDSL for specifying and compiling quantum circuits for simulation and deployment on quantum hardware. Other tools and QPLs include Cirq \cite{Cirq2018}, Quil \cite{Quil2016}, and Silq \cite{Bichsel2020}. A number of Functional QPLs have also been developed, including Quipper \cite{Green2013}, written in Haskell, VOQC \cite{Hietala2021}, in Coq, and Q\# \cite{Svore2018}, in F\#. We are contributing to this ecosystem with the development of a toolchain with similar functionality in OCaml.
+OpenQASM~\cite{Cross2022} is a quantum assembly language designed to be a common intermediate representation for quantum computing.  We support a subset of OpenQASM in our parser. Qiskit~\cite{Qiskit} is a python-based toolchain and eDSL for specifying and compiling quantum circuits for simulation and deployment on quantum hardware. Other tools and QPLs include Cirq~\cite{Cirq2018}, Quil~\cite{Quil2016}, and Silq~\cite{Bichsel2020}. A number of Functional QPLs have also been developed, including Quipper~\cite{Green2013}, written in Haskell, VOQC~\cite{Hietala2021}, in Coq, and Q\#~\cite{Svore2018}, in F\#. We are contributing to this ecosystem with the development of a toolchain with similar functionality in OCaml.
 
-To our knowledge there are no other OCaml libraries for quantum programming being maintained. The OCaml ecosystem is well-suited to the development of such a library, as it provides a rich set of libraries for numerical computation, and a powerful type system that can be used to ensure correctness of quantum programs.
+To our knowledge there are no other actively-maintained OCaml libraries for quantum programming. The OCaml ecosystem is well-suited to the development of such a library, as it provides a rich set of libraries for numerical computation, and a powerful type system that can be used to ensure correctness of quantum programs \todoCM{This makes sense for a shallow embedding, but are we really do that? The type system of the metalanguage helps ensure the correctness of the interpreter, but not necessarily the programs it interprets, no?}.
 
-\section{The Goose Library}
+\section{The \projname{} Library}
 
-\paragraph*{What is Goose} Goose is a friendly OCaml library for Quantum Computing. In its core, it features a simple intermediate representation to model quantum circuits. The library is built around this IR and provides a modular API to build and customize new tools such as simulators, compilers or static-analyzers for quantum programs.
+\paragraph*{What is \projname{}?} \projname{} is an OCaml library for quantum computing. In its core, it features a simple intermediate representation to model quantum circuits. The library is built around this IR and provides a modular API to build and customize new tools such as simulators, compilers and static analyzers for quantum programs.
 
-\paragraph*{Why ?} Quantum Computing is not accessible to a wide audience. This can be explained by several factors. (1) Maths/Physics are scary, (2) Quantum Computers aren't accessible to non- experts, (3) Computer Science in itself is perceived as hard.
-Recent projects \cite{} tried to overcome these limitations by developing more resources to make Quantum Computing more accessible to computer scientists. Goose follows the same track and try to provide a well-documented playground to start experimenting with the science of Quantum Computing and the activity of quantum programming. By choosing OCaml as an implementation language, we also hope to create interesting connections with the functional programming language community.
+\paragraph*{Why?} Quantum computing is not accessible to a wide audience. This can be explained by several factors.
+\todo{rewrite} (1) Maths/Physics are scary, 
+(2) availability of quantum computers to non-experts is limited, (3) computer science in itself is perceived as hard.
+Recent projects~\cite{} tried to overcome these limitations by developing more resources to make quantum computing more accessible to computer scientists.
+\todo{rewrite} \projname{} follows the same track and try to provide a well-documented playground to start experimenting with the science of quantum computing and the activity of quantum programming.
+By choosing OCaml as an implementation language, we also hope to create interesting connections with the functional programming language community.
 
-\paragraph*{Goose's present and future} Goose is completely open source and freely available at the address \url{}.
-Currently, Goose supports OpenQASM as a front-end, the \textit{de facto} standard for interoperability between quantum computing tools. It also accepts a friendlier textual circuit descriptions. Goose also implements a customizable simulator for quantum circuits. To demonstrate the benefits of the modular design, we derive a symbolic simulator and a C compiler from the circuit simulator. These tools are distributed as a part of the library.
+\paragraph*{\projname{}'s present and future} \projname{} is open source and freely available at the address \projurl{}. Currently, the library's front-end supports the OpenQASM 2.0 circuit representation, a \textit{de facto} standard for interoperability between quantum computing tools, in addition to a textual description of the IR. \projname{} also implements a customizable\todoCM{What does `customizable' mean?} simulator for quantum circuits. To demonstrate the benefits of the modular design, we derive a symbolic simulator and a C compiler from the circuit simulator. These tools are distributed as a part of the library.
 
-In the future, we could leverage Goose's modularity to connect goose with other existing projects such as VOQC, a formally verified compiler for quantum circuits that can be extracted to OCaml.
+In the future, we could leverage \projname{}'s modularity \todoCM{What does it mean that the library is ``modular?'' How does that \emph{actually cash out}? We never described the architecture and API or attempt to justify those engineering choices!} to connect \projname{} with other existing projects such as VOQC, a formally verified compiler for quantum circuits that can be extracted to OCaml.
 
 \bibliographystyle{plain}
 \bibliography{biblio}
