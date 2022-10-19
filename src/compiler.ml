@@ -1,33 +1,60 @@
 open Utils
 
-type mapping = ((string * int) * int) list
+(* type mapping = ((string * int) * int) list *)
 
-(* First pass: remap named registers to a single address space *)
-(* Return a pair of size of address space and register mapping *)
-let rec resolve_qaddresses (f : Qasm.stmt list) (count : int) : int * mapping =
+(* Quantum register location and size within address space *)
+type register = {
+  (* Address of the first qubit *)
+  first: int;
+  (* Size of the register *)
+  size: int;
+}
+
+type addresses = {
+  (* Register name bindings *)
+  mapping: (string, register) Hashtbl.t;
+  (* Total size of the address space *)
+  size: int;
+}
+
+let rec resolve_qaddresses' (f : Qasm.stmt list) (addrs : addresses) : addresses =
   match f with
-  | [] -> (0, [])
+  | [] -> addrs
   | Qasm.Qreg (Qasm.Id name, Qasm.Nnint sz) :: tail ->
-    let count1 = count + sz in
-    let map1 = List.init sz (fun i -> ((name, i), count + i)) in
-    let (count2, map2) = resolve_qaddresses tail count1 in
-    (count2, map1 @ map2)
-  | _ :: tail -> resolve_qaddresses tail count
+    let reg : register = {
+      first = addrs.size;
+      size = sz;
+    } in
+    (* FIXME: throw an error if there is a redundant register name *)
+    let _ = Hashtbl.add addrs.mapping name reg in
+    let addrs' = {
+      mapping = addrs.mapping;
+      size = addrs.size + sz;
+    } in
+    resolve_qaddresses' tail addrs'
+  | _ :: tail -> resolve_qaddresses' tail addrs
+
+(* Produce an address space map for the program *)
+let resolve_qaddresses (f : Qasm.stmt list) : addresses =
+  resolve_qaddresses' f {
+    mapping = Hashtbl.create 8;
+    size = 0;
+  }
 
 (* TODO: turn a uop into a Circuit.gate *)
-let translate_gate _address_for (_uop : Qasm.uop) = todo ()
+let translate_gate addrs (_uop : Qasm.uop) = todo ()
 
 (* Second pass: filter gates from Qasm AST *)
-let rec compile_gates (f : Qasm.stmt list) address_for =
+let rec compile_gates (f : Qasm.stmt list) (addrs : addresses) =
   match f with
   | [] -> []
-  | Qasm.Qop (Qasm.Q_uop uop) :: tail -> (translate_gate address_for uop) :: (compile_gates tail address_for)
+  | Qasm.Qop (Qasm.Q_uop uop) :: tail -> (translate_gate addrs uop) :: (compile_gates tail addrs)
   (* In this pass, ignore the `qreg` declarations *)
-  | Qasm.Qreg _ :: tail -> (compile_gates tail address_for)
+  | Qasm.Qreg _ :: tail -> (compile_gates tail addrs)
   | _ -> failwith "Unsupported instruction"
 
 
 let compile (prog : Qasm.t) : Circuit.t =
-  let (qbits, mapping) = resolve_qaddresses prog.body 0 in
-  let gates = compile_gates prog.body mapping in
-  { qbits; gates; }
+  let addrs = resolve_qaddresses prog.body in
+  let gates = compile_gates prog.body addrs in
+  { qbits = addrs.size; gates; }
