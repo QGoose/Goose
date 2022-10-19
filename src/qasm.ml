@@ -37,6 +37,8 @@ and id = Id of string
 
 and nnint = Nnint of int
 
+(* CM: documenting my assumptions as I write `compiler.ml`. *)
+(* I'm assuming that the `id` corresponds to a register name, and the `nnint option` to an optional address. *)
 and arg =
   | A_id of id * nnint option
 
