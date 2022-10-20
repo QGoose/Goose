@@ -51,6 +51,19 @@ let alloc_qaddresses (f : Qasm.stmt list) : addresses =
     size = 0;
   }
 
+let rec collect_gate_decls' (f : Qasm.stmt list) decls = match f with
+  | [] -> ()
+  | GateDecl (name, _params, _targets, _body) :: tail ->
+    let body = () in
+    let _ = Hashtbl.add decls name body in
+    collect_gate_decls' tail decls
+  | _ :: tail -> collect_gate_decls' tail decls
+
+let collect_gate_decls (f : Qasm.stmt list) =
+  let gate_decls = Hashtbl.create 8 in
+  let _ = collect_gate_decls' f gate_decls in
+  gate_decls
+
 (* TODO: turn a uop into a Circuit.gate *)
 let translate_gate addrs (uop : Qasm.uop) : Circuit.gate list = match uop with
   | U (_theta :: _phi :: _lambda :: [], _) -> todo ()
