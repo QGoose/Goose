@@ -64,9 +64,28 @@ let collect_gate_decls (f : Qasm.stmt list) =
   let _ = collect_gate_decls' f gate_decls in
   gate_decls
 
+let eval_float (_expr : Qasm.expr) : float = todo ()
+
 (* TODO: turn a uop into a Circuit.gate *)
 let translate_gate addrs (uop : Qasm.uop) : Circuit.gate list = match uop with
-  | U (_theta :: _phi :: _lambda :: [], _) -> todo ()
+  | U (theta :: phi :: lambda :: [], arg) ->
+    let kind : Circuit.gate_kind = U {
+        theta = eval_float theta;
+        phi = eval_float phi;
+        lambda = eval_float lambda;
+      } in
+    let tgt = match arg with
+      (* TODO: Act on all qubits in a register? *)
+      | A_id (Id _tgt_reg, None) -> failwith "Unimplemented: map gate over register"
+      (* Act on a single qubit in a register at the given offset *)
+      | A_id (Id tgt_reg, Some tgt_offset) -> resolve addrs tgt_reg (Qasm.int_of_nnint tgt_offset)
+    in
+    let (gate : Circuit.gate) = {
+      target = tgt;
+      kind = kind;
+      controls = [];
+    }
+    in [gate]
   (* FIXME: It seems like this shouldn't be a semantic error but a parser error. *)
   | U (_, _) -> failwith "Illegal arbitrary single qubit unitary"
   | CX (A_id (Id _src_reg, None), A_id (Id _tgt_reg, None)) -> todo ()

@@ -2,11 +2,11 @@ open Symbolic
 open Simulation
 
 (**
-  A Symbolic backend to simulate quantum circuits
+   A Symbolic backend to simulate quantum circuits
 *)
 module SBackend = struct
   type qstate = Expr.t array
-  
+
   let iteration_indices (i : int) (t : int) : int * int =
     let mask = (1 lsl t) - 1 in
     let notMask = lnot mask in
@@ -41,13 +41,13 @@ module SBackend = struct
   let cpx_omega m =
     Expr.(Uop (EXP, Bop (DIV, cpx_2_pi *! I, cpx_pow_2 m)))
 
-    
   let matrix_for_gate (g : Circuit.gate_kind) : matrix =
     match g with
     | X -> Expr.(Cst 0, Cst 1, Cst 1, Cst 0)
     | Z -> Expr.(Cst 1, Cst 0, Cst 0, Cst (-1))
     | H -> Expr.(cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, neg cpx_inv_sqrt_2)
     | Rm m -> Expr.(Cst 0, Cst 0, Cst 0, cpx_omega m)
+    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo ()
 
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in

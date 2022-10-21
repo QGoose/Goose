@@ -4,7 +4,7 @@ open Simulation
 
 module NaiveBackend = struct
   type qstate = Complex.t array
-  
+
   let iteration_indices (i : int) (t : int) : int * int =
     let mask = (1 lsl t) - 1 in
     let notMask = lnot mask in
@@ -37,13 +37,17 @@ module NaiveBackend = struct
 
   let cpx_pow_2 m =
     Complex.(pow cpx_2 { re = float_of_int m; im = 0.0 })
-    
+
   let matrix_for_gate (g : Circuit.gate_kind) : matrix =
     match g with
     | X -> Complex.(zero, one, one, zero)
     | Z -> Complex.(one, zero, zero, neg one)
     | H -> (cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, Complex.neg cpx_inv_sqrt_2)
     | Rm m -> Complex.(one, zero, zero, exp (div (mul cpx_2_pi i) (cpx_pow_2 m)))
+    | U { theta; phi; lambda; } -> Complex.(
+        polar (cos (theta /. 2.)) (-. (phi +. lambda) /. 2.), polar (-. sin (theta /. 2.)) (-. (phi -. lambda) /. 2.),
+        polar (sin (theta /. 2.)) ((phi -. lambda) /. 2.), polar (cos (theta /. 2.)) ((lambda +. phi) /. 2.)
+      )
 
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in
