@@ -12,6 +12,10 @@ cfloat cadd(cfloat a, cfloat b) {
 	return (cfloat) {a.real + b.real, a.imag + b.imag};
 }
 
+cfloat csub(cfloat a, cfloat b) {
+	return (cfloat) {a.real - b.real, a.imag - b.imag};
+}
+
 cfloat cmul(cfloat a, cfloat b) {
 	return (cfloat) {a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real};
 }
@@ -24,7 +28,9 @@ cfloat cneg(cfloat a) {
 	return (cfloat) {-a.real, -a.imag};
 }
 
-#define M_SQRT1_2 (cfloat) {0.707106781186547524400844362104849039, 0}
+#define SQRT1_2 (cfloat) {0.707106781186547524400844362104849039, 0}
+
+// {{ExtraConstants}}
 
 int main(int argc, char **argv) {
 	cfloat *state = (cfloat *) malloc(N * sizeof(cfloat));

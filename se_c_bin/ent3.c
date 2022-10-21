@@ -12,6 +12,10 @@ cfloat cadd(cfloat a, cfloat b) {
 	return (cfloat) {a.real + b.real, a.imag + b.imag};
 }
 
+cfloat csub(cfloat a, cfloat b) {
+	return (cfloat) {a.real - b.real, a.imag - b.imag};
+}
+
 cfloat cmul(cfloat a, cfloat b) {
 	return (cfloat) {a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real};
 }
@@ -24,7 +28,9 @@ cfloat cneg(cfloat a) {
 	return (cfloat) {-a.real, -a.imag};
 }
 
-#define M_SQRT1_2 (cfloat) {0.707106781186547524400844362104849039, 0}
+#define SQRT1_2 (cfloat) {0.707106781186547524400844362104849039, 0}
+
+// {{ExtraConstants}}
 
 int main(int argc, char **argv) {
 	cfloat *state = (cfloat *) malloc(N * sizeof(cfloat));
@@ -38,14 +44,14 @@ int main(int argc, char **argv) {
 	// Allocate output state buffer
 	cfloat *out_state = (cfloat *) malloc(N * sizeof(cfloat));
 	
-	out_state[0] = cadd(cmul(M_SQRT1_2,state[0]),cmul(M_SQRT1_2,state[1]));
-	out_state[1] = cadd(cmul(M_SQRT1_2,state[6]),cmul(cneg(M_SQRT1_2),state[7]));
-	out_state[2] = cadd(cmul(M_SQRT1_2,state[2]),cmul(M_SQRT1_2,state[3]));
-	out_state[3] = cadd(cmul(M_SQRT1_2,state[4]),cmul(cneg(M_SQRT1_2),state[5]));
-	out_state[4] = cadd(cmul(M_SQRT1_2,state[4]),cmul(M_SQRT1_2,state[5]));
-	out_state[5] = cadd(cmul(M_SQRT1_2,state[2]),cmul(cneg(M_SQRT1_2),state[3]));
-	out_state[6] = cadd(cmul(M_SQRT1_2,state[6]),cmul(M_SQRT1_2,state[7]));
-	out_state[7] = cadd(cmul(M_SQRT1_2,state[0]),cmul(cneg(M_SQRT1_2),state[1]));
+	out_state[0] = cmul(SQRT1_2,cadd(state[0],state[1]));
+	out_state[1] = cmul(SQRT1_2,csub(state[6],state[7]));
+	out_state[2] = cmul(SQRT1_2,cadd(state[2],state[3]));
+	out_state[3] = cmul(SQRT1_2,csub(state[4],state[5]));
+	out_state[4] = cmul(SQRT1_2,cadd(state[4],state[5]));
+	out_state[5] = cmul(SQRT1_2,csub(state[2],state[3]));
+	out_state[6] = cmul(SQRT1_2,cadd(state[6],state[7]));
+	out_state[7] = cmul(SQRT1_2,csub(state[0],state[1]));
 	
 
 	// Print state

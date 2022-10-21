@@ -79,7 +79,14 @@ module Expr = struct
 
   let rec reduce (e:t) = 
     match e with
-    | Uop (Qasm.INV, Uop (Qasm.SQRT, Cst 2)) -> CustomSymbol "M_SQRT1_2" 
+    | Uop (Qasm.INV, Uop (Qasm.SQRT, Cst 2)) -> CustomSymbol "SQRT1_2" 
+
+    (* Distributivity *)
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, Cst c0, e0), Bop (Qasm.MUL, Cst c1, e1)) when c0 == c1 -> Bop (Qasm.MUL, Cst c0, Bop (Qasm.ADD, reduce e0, reduce e1))
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, CustomSymbol s0, e0), Bop (Qasm.MUL, CustomSymbol s1, e1)) when s0 == s1 -> Bop (Qasm.MUL, CustomSymbol s0, Bop (Qasm.ADD, reduce e0, reduce e1))
+    (* Special cases for neg *)
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, Cst c0, e0), Bop (Qasm.MUL, Uop (Qasm.NEG, Cst c1), e1)) when c0 == c1 -> Bop (Qasm.MUL, Cst c0, Bop (Qasm.SUB, reduce e0, reduce e1))
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, CustomSymbol s0, e0), Bop (Qasm.MUL, Uop (Qasm.NEG, CustomSymbol s1), e1)) when s0 == s1 -> Bop (Qasm.MUL, CustomSymbol s0, Bop (Qasm.SUB, reduce e0, reduce e1))
 
     | Bop (Qasm.MUL, Cst 0, _) -> Cst 0
     | Bop (Qasm.MUL, _, Cst 0) -> Cst 0
@@ -96,7 +103,7 @@ module Expr = struct
     | Bop (Qasm.POW, Cst 1, _) -> Cst 1
     | Bop (Qasm.POW, e, Cst 1) -> reduce e
 
-
+    (* Base cases *)
     | Bop (op, e1, e2) -> Bop (op, reduce e1, reduce e2)
     | Uop (op, e) -> Uop (op, reduce e)
     | Cst c -> Cst c
