@@ -1,6 +1,6 @@
 # QuantumGoose
 
-ICFP non-sense about quantum languages 
+An OCaml library for quantum computing
 
 ## Instruction
 
@@ -27,10 +27,4 @@ dune build
 
 ```
 dune runtest
-```
-
-**To execute the QuantumGoose compiler (qgc)**
-
-```
-dune exec qgc
 ```
