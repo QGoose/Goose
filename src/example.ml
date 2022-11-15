@@ -2,8 +2,10 @@ open Circuit
 open Naive
 open Se
 
+(* n-qubit uniform superposition state. *)
 let superposition n = {qbits = n; gates = List.init n (fun i -> {target = (A i); kind = H; controls = []})}
 
+(* n-qubit GHZ state. *)
 let entanglement n = {
   qbits = n;
   gates = List.cons ({
@@ -17,6 +19,7 @@ let entanglement n = {
   }))
 }
 
+(* n-qubit Quantum Fourier Transform. *)
 let qft n = {
   qbits = n;
   gates = List.concat (List.init n (fun i -> 

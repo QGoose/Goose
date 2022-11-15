@@ -7,6 +7,7 @@ open Simulation
 module SBackend = struct
   type qstate = Expr.t array
 
+  (* Returns the indices of the state amplitudes required for the ith iteration of a gate on target t. *)
   let iteration_indices (i : int) (t : int) : int * int =
     let mask = (1 lsl t) - 1 in
     let notMask = lnot mask in
@@ -14,6 +15,7 @@ module SBackend = struct
     let i2 = i1 lor (1 lsl t) in
     (i1, i2)
 
+  (* Initialises a state vector given a number of qubits. *)
   let init qbits =
     let len = 1 lsl qbits in
     (* All-zero state *)
@@ -23,6 +25,7 @@ module SBackend = struct
     (* Array.set state 0 (Expr.Cst (Complex.one)); *)
     state
 
+  (* Check if an iteration should execute based on the controls of the gate. *)
   let controls_check (state_index: int) (controls: Circuit.adr list): bool =
     let check (Circuit.A c) = (1 lsl c) land state_index > 0 in
     List.(fold_left (&&) true (map check controls))
@@ -41,6 +44,7 @@ module SBackend = struct
   let cpx_omega m =
     Expr.(Uop (EXP, Bop (DIV, cpx_2_pi *! I, cpx_pow_2 m)))
 
+  (* Returns the symbolic matrix corresponding to a gate kind. *)
   let matrix_for_gate (g : Circuit.gate_kind) : matrix =
     match g with
     | X -> Expr.(Cst 0, Cst 1, Cst 1, Cst 0)
@@ -49,6 +53,7 @@ module SBackend = struct
     | Rm m -> Expr.(Cst 0, Cst 0, Cst 0, cpx_omega m)
     | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo ()
 
+  (* Applies a gate to a state vector using symbolic QWM (2^(n-1) iterations). *)
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in
     let (a, b, c, d) = matrix_for_gate g.kind in

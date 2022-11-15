@@ -2,9 +2,11 @@
 
 open Simulation
 
+(* A simple quantum circuit simulation backend based on Qubit-Wise Multiplication. *)
 module NaiveBackend = struct
   type qstate = Complex.t array
 
+  (* Returns the indices of the state amplitudes required for the ith iteration of a gate on target t. *)
   let iteration_indices (i : int) (t : int) : int * int =
     let mask = (1 lsl t) - 1 in
     let notMask = lnot mask in
@@ -12,6 +14,7 @@ module NaiveBackend = struct
     let i2 = i1 lor (1 lsl t) in
     (i1, i2)
 
+  (* Initialises a state vector given a number of qubits. *)
   let init qbits =
     let len = 1 lsl qbits in
     (* All-zero state *)
@@ -20,6 +23,7 @@ module NaiveBackend = struct
     Array.set state 0 Complex.one;
     state
 
+  (* Check if an iteration should execute based on the controls of the gate. *)
   let controls_check (state_index: int) (controls: Circuit.adr list): bool =
     let check (Circuit.A c) = (1 lsl c) land state_index > 0 in
     List.(fold_left (&&) true (map check controls))
@@ -38,6 +42,7 @@ module NaiveBackend = struct
   let cpx_pow_2 m =
     Complex.(pow cpx_2 { re = float_of_int m; im = 0.0 })
 
+  (* Returns the matrix corresponding to a gate. *)
   let matrix_for_gate (g : Circuit.gate_kind) : matrix =
     match g with
     | X -> Complex.(zero, one, one, zero)
@@ -49,6 +54,7 @@ module NaiveBackend = struct
         polar (sin (theta /. 2.)) ((phi -. lambda) /. 2.), polar (cos (theta /. 2.)) ((lambda +. phi) /. 2.)
       )
 
+  (* Applies a gate to a state vector using QWM (2^(n-1) iterations). *)
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in
     let (a, b, c, d) = matrix_for_gate g.kind in

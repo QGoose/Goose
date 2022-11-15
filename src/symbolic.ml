@@ -1,5 +1,6 @@
 (** {1 Symbolic Computations} *)
 
+(* Contains methods for managing symbols based on integers. *)
 module Symbol : sig
   type t
   val fresh : unit -> t
@@ -8,17 +9,21 @@ module Symbol : sig
 end = struct
   type t = int
 
+  (* Returns the next symbol to be generated. *)
   let fresh =
     let current = ref (-1) in
     fun () -> incr current; !current
   
+  (* Returns the string representation of a symbol. *)
   let repr i =
     Printf.sprintf "x_%d" i
 
+  (* Returns only the index representation of a symbol, as a string. *)
   let index_string i = 
     Printf.sprintf "%d" i
 end
 
+(* Represents an Expression in the symbex engine. *)
 module Expr = struct
   type t =
     | Bop of Qasm.binaryop * t * t
@@ -35,6 +40,7 @@ module Expr = struct
 
   let neg x = Uop (Qasm.NEG, x)
 
+  (* Returns a C template-compatible string of a binary operation. *)
   let cstring_of_binary op = match op with
     | Qasm.MUL -> "cmul"
     | Qasm.ADD -> "cadd"
@@ -42,6 +48,7 @@ module Expr = struct
     | Qasm.DIV -> "cdiv"
     | Qasm.POW -> "cpow"
   
+  (* Returns a C template-compatible string of a unary operation. *))  
   let cstring_of_unary op = match op with
     | Qasm.SIN  -> "csin"
     | Qasm.COS  -> "ccos"
@@ -52,6 +59,7 @@ module Expr = struct
     | Qasm.SQRT -> "csqrt"
     | Qasm.INV -> "cinv"
 
+  (* Returns a string representation of the expression. *)
   let rec repr (e : t) =
     match e with
     | Bop (op, e1, e2) ->
@@ -77,6 +85,7 @@ module Expr = struct
     | I -> Printf.sprintf "i"
     | Var v -> Printf.sprintf "%s" (Symbol.repr v) *)
 
+  (* Reduces an expression by matching against reduction rules. *)
   let rec reduce (e:t) = 
     match e with
     | Uop (Qasm.INV, Uop (Qasm.SQRT, Cst 2)) -> CustomSymbol "SQRT1_2" 
@@ -112,6 +121,7 @@ module Expr = struct
     | Var v -> Var v
     | CustomSymbol s -> CustomSymbol s
 
+  (* Converts an expression to a C template-compatible string. *)
   let rec c_template_repr (e: t) =
     match reduce (reduce e) with
     | Bop (op, e1, e2) ->
