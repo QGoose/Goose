@@ -48,7 +48,7 @@ module Expr = struct
     | Qasm.DIV -> "cdiv"
     | Qasm.POW -> "cpow"
   
-  (* Returns a C template-compatible string of a unary operation. *))  
+  (* Returns a C template-compatible string of a unary operation. *)  
   let cstring_of_unary op = match op with
     | Qasm.SIN  -> "csin"
     | Qasm.COS  -> "ccos"
@@ -133,4 +133,5 @@ module Expr = struct
     | I -> Printf.sprintf "(cfloat){0,1}"
     | Var v -> Printf.sprintf "state[%s]" (Symbol.index_string v)
     | CustomSymbol s -> s
+
 end
