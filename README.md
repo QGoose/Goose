@@ -2,28 +2,33 @@
 
 An OCaml library for quantum computing
 
-## Instruction
+## Requirements
 
-Compiling the project requires `opam`, `opal`, `dune`, and `ppx_inline_test` to be installed
+**The library has been tested to work with OCaml version 4.14.0.**
 
-**To install ocaml/opam**
+OCaml/opam can be installed from the [OCaml website](https://ocaml.org/docs/up-and-running).
 
-[ocaml website](https://ocaml.org/docs/up-and-running)
+Additionally, to compile the library, we rely on the following packages:  `opal`, `dune`, and `ppx_inline_test`.
 
-**To setup the project**
+They can be installed using opam.
+
+## Install
+
+Clone the repository, then...
 
 ```
 cd Goose
 opam install dune opal ppx_inline_test
 ```
-**To compile**
+
+Afterwards, the library can be **compiled** using
 
 ```
 dune build
 
 ```
 
-**To test**
+To run the library **test suite**:
 
 ```
 dune runtest
@@ -69,32 +74,32 @@ This produces the following C code for a 3-qubit entanglement circuit:
 
 ```c
 int main(int argc, char **argv) {
-	cfloat *state = (cfloat *) malloc(N * sizeof(cfloat));
-	
-	// Initialize state
-	for (int i = 0; i < N; i++) {
-		state[i] = (cfloat) {0.0, 0.0};
-	}
-	state[0] = (cfloat) {1.0, 0.0};
+    cfloat *state = (cfloat *) malloc(N * sizeof(cfloat));
 
-	// Allocate output state buffer
-	cfloat *out_state = (cfloat *) malloc(N * sizeof(cfloat));
-	
-	out_state[0] = cmul(SQRT1_2,cadd(state[0],state[1]));
-	out_state[1] = cmul(SQRT1_2,csub(state[6],state[7]));
-	out_state[2] = cmul(SQRT1_2,cadd(state[2],state[3]));
-	out_state[3] = cmul(SQRT1_2,csub(state[4],state[5]));
-	out_state[4] = cmul(SQRT1_2,cadd(state[4],state[5]));
-	out_state[5] = cmul(SQRT1_2,csub(state[2],state[3]));
-	out_state[6] = cmul(SQRT1_2,cadd(state[6],state[7]));
-	out_state[7] = cmul(SQRT1_2,csub(state[0],state[1]));
-	
+    // Initialize state
+    for (int i = 0; i < N; i++) {
+        state[i] = (cfloat) {0.0, 0.0};
+    }
+    state[0] = (cfloat) {1.0, 0.0};
 
-	// Print state
-	for (int i = 0; i < N; i++) {
-		printf("|%d>: %f + %fi\n", i, out_state[i].real, out_state[i].imag);
-	}	
+    // Allocate output state buffer
+    cfloat *out_state = (cfloat *) malloc(N * sizeof(cfloat));
 
-	return 0;
+    out_state[0] = cmul(SQRT1_2,cadd(state[0],state[1]));
+    out_state[1] = cmul(SQRT1_2,csub(state[6],state[7]));
+    out_state[2] = cmul(SQRT1_2,cadd(state[2],state[3]));
+    out_state[3] = cmul(SQRT1_2,csub(state[4],state[5]));
+    out_state[4] = cmul(SQRT1_2,cadd(state[4],state[5]));
+    out_state[5] = cmul(SQRT1_2,csub(state[2],state[3]));
+    out_state[6] = cmul(SQRT1_2,cadd(state[6],state[7]));
+    out_state[7] = cmul(SQRT1_2,csub(state[0],state[1]));
+
+
+    // Print state
+    for (int i = 0; i < N; i++) {
+        printf("|%d>: %f + %fi\n", i, out_state[i].real, out_state[i].imag);
+    }
+
+    return 0;
 }
 ```
