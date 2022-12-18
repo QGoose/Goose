@@ -67,7 +67,7 @@ The above entanglement circuit can be compiled to C using the symbolic simulator
 open Quantumlib
 open C_emitter
 
-CEmitter.emitc (entanglement 3) (open_out "se_c_bin/ent3.c")
+emitc (entanglement 3) (open_out "se_c_bin/ent3.c")
 ```
 
 This produces the following C code for a 3-qubit entanglement circuit:
