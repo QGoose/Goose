@@ -120,18 +120,4 @@ module Expr = struct
     | I -> I
     | Var v -> Var v
     | CustomSymbol s -> CustomSymbol s
-
-  (* Converts an expression to a C template-compatible string. *)
-  let rec c_template_repr (e: t) =
-    match reduce (reduce e) with
-    | Bop (op, e1, e2) ->
-      Printf.sprintf "%s(%s,%s)" (cstring_of_binary op) (c_template_repr e1)  (c_template_repr e2)
-    | Uop (op, e) ->
-      Printf.sprintf "%s(%s)" (cstring_of_unary op) (c_template_repr e)
-    | Cst c -> Printf.sprintf "(cfloat){%d,0}" c
-    | Pi -> Printf.sprintf "(cfloat){M_PI,0}"
-    | I -> Printf.sprintf "(cfloat){0,1}"
-    | Var v -> Printf.sprintf "state[%s]" (Symbol.index_string v)
-    | CustomSymbol s -> s
-
 end
