@@ -1,40 +1,24 @@
-(** * Quantum Circuit Intermediate Representation
-
-    A simplified representation of Quantum Circuits
-*)
+(** A simplified representation of Quantum Circuits. *)
 
 type adr = A of int
 
-(**
-   Kind of Gates.
-
-   For the sake of simplicitiy, we pick a small
-   set of gates that is not enough to express arbitrary
-   quantum circuits.
-*)
-
-(* An arbitrary single-qubit gate, parametrized as in OpenQASM *)
+(** An arbitrary single-qubit gate, parametrized as in OpenQASM *)
 type arb_sq_gate = {
   theta : float;
   phi : float;
   lambda : float;
 }
 
+(** Kind of Gates. *)
 type gate_kind =
   | X (* Not Gate *)
   | H (* Hadamard Gate *)
   | Z (* Phase Gate *)
-  | U of {
-      theta : float;
-      phi : float;
-      lambda : float;
-    }
+  | U of arb_sq_gate
   | Rm of int
 
-(**
-   Generic Gates.
-
-   A gate has a target qubit and a set of set of controls
+(** Generic Gates.
+    A gate has a target qubit and a set of set of controls.
 *)
 type gate = {
   (* Target qubit address *)
@@ -44,12 +28,10 @@ type gate = {
   controls : adr list;
 }
 
-(**
-   Circuits.
-
+(** Circuits.
    A quantum circuit is defined
    by its number a qubits
-   and an (ordered) list of gates
+   and an (ordered) list of gates.
 *)
 type t = {
   (* Total number of qubits *)

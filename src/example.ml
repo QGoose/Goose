@@ -1,3 +1,5 @@
+(** A collection of examples using circuits expressed in {!Circuit.t} *)
+
 open Circuit
 open Naive
 open Se

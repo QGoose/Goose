@@ -1,3 +1,5 @@
+(** OpenQASM parser (supports OpenQASM 2.0) *)
+
 open Opal
 open Qasm
 

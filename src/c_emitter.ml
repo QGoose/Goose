@@ -2,11 +2,6 @@ open Se
 open Symbolic
 open Expr
 
-(** {1 C Code emission}
-    This module implements C code generation for quantum circuits (see {Circuit.t}).
-    It uses a symbolic version of the simulator (see [Symbolic] and [Simulation]).
-*)
-
 (** Converts an expression to a C template-compatible string. *)
 let rec c_template_repr (e : t) =
   match reduce (reduce e) with

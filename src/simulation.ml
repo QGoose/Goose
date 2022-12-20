@@ -1,6 +1,8 @@
+(** Interface of simulators for quantum circuits *)
+
 open Circuit
 
-(* A generic backend for quantum circuit simulation. *)
+(** A generic backend for quantum circuit simulation. *)
 module type BACKEND = sig
   type qstate
   val init : int -> qstate
@@ -8,7 +10,7 @@ module type BACKEND = sig
   val apply_gate : Circuit.gate -> qstate -> unit
 end
 
-(* Given a BACKEND, gives a quantum circuit simulator by defining the run function over the backend. *)
+(** Given a [BACKEND], produces a quantum circuit simulator by defining the [run] function. *)
 module Make(B : BACKEND) : sig
   val run : Circuit.t -> B.qstate
 end = struct

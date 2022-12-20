@@ -1,8 +1,12 @@
+(** Abstract Syntax Tree of OpenQASM *)
+
+(** Type of Qasm programs *)
 type t = {
   version : nnint * nnint;
   body : stmt list;
 }
 
+(** Type of Qasm statements *)
 and stmt =
   (* Quantum register *)
   | Qreg of id * nnint
@@ -19,10 +23,12 @@ and stmt =
   (* Barrier *)
   | Barrier of arg list
 
+(** Gate operators *)
 and gop =
   | G_uop of uop
   | G_barrier of id list
 
+(** Quantum operators *)
 and qop =
   | Q_uop of uop
   | Q_measure of arg * arg
@@ -33,15 +39,19 @@ and uop =
   | CX of arg * arg
   | App of id * expr list * arg list
 
+(** Identifiers *)
 and id = Id of string
 
+(** Non-negative integers *)
 and nnint = Nnint of int
 
 (* CM: documenting my assumptions as I write `compiler.ml`. *)
 (* I'm assuming that the `id` corresponds to a register name, and the `nnint option` to an optional address. *)
+(** Arguments of the operators *)
 and arg =
   | A_id of id * nnint option
 
+(** Expressions over reals *)
 and expr =
   | E_cst of float
   | E_int of nnint
@@ -50,6 +60,7 @@ and expr =
   | E_bop of binaryop * expr * expr
   | E_uop of unaryop * expr
 
+(** Binary operations *)
 and binaryop =
   | ADD
   | MUL
@@ -57,6 +68,7 @@ and binaryop =
   | DIV
   | POW
 
+(** Unary operations *)
 and unaryop =
   | SIN
   | COS
@@ -66,6 +78,8 @@ and unaryop =
   | LN
   | SQRT
   | INV
+
+(** {2 Pretty printers}*)
 
 let string_of_id = function
   | Id s -> s

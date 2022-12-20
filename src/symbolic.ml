@@ -1,28 +1,32 @@
-(** {1 Symbolic Computations}
+(** Symbolic computations.
     This module implements symbolic computations
     for complex-valued expressions.
-    It is used for generation of C code.
+    It is used by the symbolic simulator {!Se}.
 *)
 
 (** Generation of unique symbols *)
 module Symbol : sig
   type t
+
+  (** Generates a fresh symbol. *)
   val fresh : unit -> t
+
+  (** Returns the string representation of a symbol. *)
   val repr  : t -> string
+
+  (** Returns the index of a symbol (each symbol has a unique index). *)
   val index : t -> int
 end = struct
   type t = int
 
-  (** Generates a fresh symbol. *)
   let fresh =
     let current = ref (-1) in
     fun () -> incr current; !current
   
-  (** Returns the string representation of a symbol. *)
+
   let repr i =
     Printf.sprintf "x_%d" i
 
-  (** Returns the index of a symbol (each symbol has a unique index). *)
   let index i = i
 end
 
