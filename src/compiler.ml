@@ -17,6 +17,12 @@ type addresses = {
   size: int;
 }
 
+let new_addresses (_ : unit) : addresses = {
+  mapping = Hashtbl.create 8;
+  size = 0;
+}
+
+
 (* TODO: make this namespaced by a module, where `addresses` becomes `Addresses.t` or whatever the convention is. *)
 let resolve (addrs : addresses) (name : string) (offset : int) : Circuit.adr =
   (* Why doesn't this function return a `register option`? *)
@@ -110,8 +116,47 @@ let rec compile_gates (f : Qasm.stmt list) (addrs : addresses) =
   | Qasm.Qreg _ :: tail -> (compile_gates tail addrs)
   | _ -> failwith "Unsupported instruction"
 
-
 let compile (prog : Qasm.t) : Circuit.t =
   let addrs = alloc_qaddresses prog.body in
   let gates = compile_gates prog.body addrs in
   { qbits = addrs.size; gates; }
+
+(* starting over *)
+
+type gate = unit
+
+type environment = {
+  (* Register name bindings *)
+  addrs: addresses;
+  (* Gate abstractions *)
+  funcs: (string, gate) Hashtbl.t;
+}
+
+(*  Create a new empty environment *)
+let new_environment (_ : unit) : environment = {
+  addrs = new_addresses ();
+  funcs = Hashtbl.create 8;
+}
+
+(* TODO: rename *)
+type compile_state = {
+  env: environment;
+  gates: Circuit.gate list;
+}
+
+let compile_stmt (env : compile_state) (stmt : Qasm.stmt) : compile_state = match stmt with
+  | Qasm.Qreg (Qasm.Id name, Qasm.Nnint sz) -> todo ()
+  | GateDecl (name, _params, _targets, _body) -> todo ()
+  | Qasm.Qop (Qasm.Q_uop uop) -> todo ()
+  | _ -> todo ()
+
+let compile' (prog : Qasm.t) : Circuit.t =
+  let init_state = {
+    env = new_environment ();
+    gates = [];
+  } in
+  let (out_state : compile_state) = List.fold_left compile_stmt init_state prog.body in
+  {
+    qbits = out_state.env.addrs.size;
+    gates = out_state.gates;
+  }
