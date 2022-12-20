@@ -1,30 +1,35 @@
-(** {1 Symbolic Computations} *)
+(** {1 Symbolic Computations}
+    This module implements symbolic computations
+    for complex-valued expressions.
+    It is used for generation of C code.
+*)
 
-(* Contains methods for managing symbols based on integers. *)
+(** Generation of unique symbols *)
 module Symbol : sig
   type t
   val fresh : unit -> t
   val repr  : t -> string
-  val index_string : t -> string
+  val index : t -> int
 end = struct
   type t = int
 
-  (* Returns the next symbol to be generated. *)
+  (** Generates a fresh symbol. *)
   let fresh =
     let current = ref (-1) in
     fun () -> incr current; !current
   
-  (* Returns the string representation of a symbol. *)
+  (** Returns the string representation of a symbol. *)
   let repr i =
     Printf.sprintf "x_%d" i
 
-  (* Returns only the index representation of a symbol, as a string. *)
-  let index_string i = 
-    Printf.sprintf "%d" i
+  (** Returns the index of a symbol (each symbol has a unique index). *)
+  let index i = i
 end
 
-(* Represents an Expression in the symbex engine. *)
+(** Manipulation of symbolic expressions. *)
 module Expr = struct
+  
+  (** Type of symbolic expressions. *)
   type t =
     | Bop of Qasm.binaryop * t * t
     | Uop of Qasm.unaryop * t
@@ -34,32 +39,36 @@ module Expr = struct
     | Var of Symbol.t
     | CustomSymbol of String.t
 
+  (** Symbolic product. *)
   let ( *! ) x y = Bop (Qasm.MUL, x, y)
   
+  (** Symbolic sum. *)
   let ( +! ) x y = Bop (Qasm.ADD, x, y)
 
+  (** Symbolic negation. *)
   let neg x = Uop (Qasm.NEG, x)
 
-  (* Returns a C template-compatible string of a binary operation. *)
-  let cstring_of_binary op = match op with
+  (** Returns a C template-compatible string of a binary operation. *)
+  let cstring_of_binary op =
+    match op with
     | Qasm.MUL -> "cmul"
     | Qasm.ADD -> "cadd"
     | Qasm.SUB -> "csub"
     | Qasm.DIV -> "cdiv"
     | Qasm.POW -> "cpow"
-  
-  (* Returns a C template-compatible string of a unary operation. *)  
+
+  (** Returns a C template-compatible string of a unary operation. *)
   let cstring_of_unary op = match op with
     | Qasm.SIN  -> "csin"
     | Qasm.COS  -> "ccos"
     | Qasm.TAN  -> "ctan"
     | Qasm.EXP  -> "cexp"
-    | Qasm.NEG -> "cneg"
+    | Qasm.NEG  -> "cneg"
     | Qasm.LN   -> "cln"
     | Qasm.SQRT -> "csqrt"
-    | Qasm.INV -> "cinv"
+    | Qasm.INV  -> "cinv"
 
-  (* Returns a string representation of the expression. *)
+  (** Returns a string representation of the expression. *)
   let rec repr (e : t) =
     match e with
     | Bop (op, e1, e2) ->
@@ -74,28 +83,19 @@ module Expr = struct
       Printf.sprintf "%s" (Symbol.repr v)
     | CustomSymbol s -> s
 
-  (* let rec repr (e : t) =
+  (** Reduces an expression by matching against reduction rules. *)
+  let rec reduce (e : t) = 
     match e with
-    | Bop (op, e1, e2) ->
-      Printf.sprintf "(%s %s %s)" (repr e1) (Qasm.string_of_binary op) (repr e2)
-    | Uop (op, e) ->
-      Printf.sprintf "%s(%s)" (Qasm.string_of_unary op) (repr e)
-    | Cst c -> Printf.sprintf "%d" c
-    | Pi -> Printf.sprintf "pi"
-    | I -> Printf.sprintf "i"
-    | Var v -> Printf.sprintf "%s" (Symbol.repr v) *)
-
-  (* Reduces an expression by matching against reduction rules. *)
-  let rec reduce (e:t) = 
-    match e with
-    | Uop (Qasm.INV, Uop (Qasm.SQRT, Cst 2)) -> CustomSymbol "SQRT1_2" 
-
     (* Distributivity *)
-    | Bop (Qasm.ADD, Bop (Qasm.MUL, Cst c0, e0), Bop (Qasm.MUL, Cst c1, e1)) when c0 == c1 -> Bop (Qasm.MUL, Cst c0, Bop (Qasm.ADD, reduce e0, reduce e1))
-    | Bop (Qasm.ADD, Bop (Qasm.MUL, CustomSymbol s0, e0), Bop (Qasm.MUL, CustomSymbol s1, e1)) when s0 == s1 -> Bop (Qasm.MUL, CustomSymbol s0, Bop (Qasm.ADD, reduce e0, reduce e1))
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, Cst c0, e0), Bop (Qasm.MUL, Cst c1, e1)) when c0 = c1 ->
+      Bop (Qasm.MUL, Cst c0, Bop (Qasm.ADD, reduce e0, reduce e1))
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, CustomSymbol s0, e0), Bop (Qasm.MUL, CustomSymbol s1, e1)) when s0 = s1 ->
+      Bop (Qasm.MUL, CustomSymbol s0, Bop (Qasm.ADD, reduce e0, reduce e1))
     (* Special cases for neg *)
-    | Bop (Qasm.ADD, Bop (Qasm.MUL, Cst c0, e0), Bop (Qasm.MUL, Uop (Qasm.NEG, Cst c1), e1)) when c0 == c1 -> Bop (Qasm.MUL, Cst c0, Bop (Qasm.SUB, reduce e0, reduce e1))
-    | Bop (Qasm.ADD, Bop (Qasm.MUL, CustomSymbol s0, e0), Bop (Qasm.MUL, Uop (Qasm.NEG, CustomSymbol s1), e1)) when s0 == s1 -> Bop (Qasm.MUL, CustomSymbol s0, Bop (Qasm.SUB, reduce e0, reduce e1))
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, Cst c0, e0), Bop (Qasm.MUL, Uop (Qasm.NEG, Cst c1), e1)) when c0 = c1 ->
+      Bop (Qasm.MUL, Cst c0, Bop (Qasm.SUB, reduce e0, reduce e1))
+    | Bop (Qasm.ADD, Bop (Qasm.MUL, CustomSymbol s0, e0), Bop (Qasm.MUL, Uop (Qasm.NEG, CustomSymbol s1), e1)) when s0 = s1 ->
+      Bop (Qasm.MUL, CustomSymbol s0, Bop (Qasm.SUB, reduce e0, reduce e1))
 
     | Bop (Qasm.MUL, Cst 0, _) -> Cst 0
     | Bop (Qasm.MUL, _, Cst 0) -> Cst 0

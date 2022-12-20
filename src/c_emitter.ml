@@ -2,12 +2,16 @@ open Se
 open Symbolic
 open Expr
 
-(* The CEmitter uses a symbex backend to evaluate a circuit and
-  outputs pure C code based on a template. *)
+(** {1 C Code emission}
+    This module implements C code generation for quantum circuits (see {Circuit.t}).
+    It uses a symbolic version of the simulator (see [Symbolic] and [Simulation]).
+*)
 
 (** Converts an expression to a C template-compatible string. *)
 let rec c_template_repr (e : t) =
   match reduce (reduce e) with
+  | Uop (Qasm.INV, Uop (Qasm.SQRT, Cst 2)) ->
+    Printf.sprintf "SQRT1_2"
   | Bop (op, e1, e2) ->
     Printf.sprintf "%s(%s,%s)" (cstring_of_binary op) (c_template_repr e1) (c_template_repr e2)
   | Uop (op, e) ->
@@ -15,7 +19,7 @@ let rec c_template_repr (e : t) =
   | Cst c -> Printf.sprintf "(cfloat){%d,0}" c
   | Pi -> Printf.sprintf "(cfloat){M_PI,0}"
   | I -> Printf.sprintf "(cfloat){0,1}"
-  | Var v -> Printf.sprintf "state[%s]" (Symbol.index_string v)
+  | Var v -> Printf.sprintf "state[%d]" (Symbol.index v)
   | CustomSymbol s -> s
 
 (** C code for the evaluation of one state *)
