@@ -144,10 +144,19 @@ type compile_state = {
   gates: Circuit.gate list;
 }
 
+let compile_reg_decl (env : compile_state) (name : Qasm.id) (sz : Qasm.nnint) : compile_state = todo ()
+
+let compile_gate_decl (env : compile_state) (name : Qasm.id) (params : Qasm.id list) (targets : Qasm.id list) (body : Qasm.gop list) : compile_state = todo ()
+
+let compile_uop (env : compile_state) (op : Qasm.uop): compile_state = todo ()
+
 let compile_stmt (env : compile_state) (stmt : Qasm.stmt) : compile_state = match stmt with
-  | Qasm.Qreg (Qasm.Id name, Qasm.Nnint sz) -> todo ()
-  | GateDecl (name, _params, _targets, _body) -> todo ()
-  | Qasm.Qop (Qasm.Q_uop uop) -> todo ()
+  (* Compile register declaration *)
+  | Qasm.Qreg (name, sz) -> compile_reg_decl env name sz
+  (* Compile gate declaration *)
+  | GateDecl (name, params, targets, body) -> compile_gate_decl env name params targets body
+  (* Compile uop *)
+  | Qasm.Qop (Qasm.Q_uop uop) -> compile_uop env uop
   | _ -> todo ()
 
 let compile' (prog : Qasm.t) : Circuit.t =
