@@ -87,8 +87,8 @@ let compile_reg_decl (addrs : addresses) (name : Qasm.id) (sz : Qasm.nnint) : ad
   addrs'
 
 (* Compile gate declaration *)
-let compile_gate_decl (cs : compile_state) (name : Qasm.id) (params : Qasm.id list)
-    (targets : Qasm.id list) (body : Qasm.gop list) : compile_state = todo ()
+let compile_gate_decl (_cs : compile_state) (_name : Qasm.id) (_params : Qasm.id list)
+    (_targets : Qasm.id list) (_body : Qasm.gop list) : compile_state = todo ()
 
 (* Turn a uop into (possibly a list of) Circuit.gate *)
 let compile_uop (addrs : addresses) (uop : Qasm.uop) : Circuit.gate list = match uop with
@@ -144,9 +144,10 @@ let compile_stmt (cs : compile_state) (stmt : Qasm.stmt) : compile_state = match
       env = cs.env;
       gates = cs.gates @ new_gates;
     }
+  (* FIXME Ignore everything else for now *)
   | _ -> todo ()
 
-let compile' (prog : Qasm.t) : Circuit.t =
+let compile (prog : Qasm.t) : Circuit.t =
   let init_state = {
     env = new_environment ();
     gates = [];
