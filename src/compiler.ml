@@ -144,19 +144,46 @@ type compile_state = {
   gates: Circuit.gate list;
 }
 
-let compile_reg_decl (env : compile_state) (name : Qasm.id) (sz : Qasm.nnint) : compile_state = todo ()
+(* Compiler register declaration *)
+let compile_reg_decl (addrs : addresses) (name : Qasm.id) (sz : Qasm.nnint) : addresses =
+  (* Unwrap the arguments *)
+  let Qasm.Id name = name in
+  let Qasm.Nnint sz = sz in
+  (* Create the new register *)
+  let reg : register = {
+    first = addrs.size;
+    size = sz;
+  } in
+  (* FIXME: throw an error if there is a redundant register name *)
+  let _ = Hashtbl.add addrs.mapping name reg in
+  let addrs' = {
+    mapping = addrs.mapping;
+    size = addrs.size + sz;
+  } in
+  addrs'
 
-let compile_gate_decl (env : compile_state) (name : Qasm.id) (params : Qasm.id list) (targets : Qasm.id list) (body : Qasm.gop list) : compile_state = todo ()
+(* Compile gate declaration *)
+let compile_gate_decl (cs : compile_state) (name : Qasm.id) (params : Qasm.id list)
+    (targets : Qasm.id list) (body : Qasm.gop list) : compile_state = todo ()
 
-let compile_uop (env : compile_state) (op : Qasm.uop): compile_state = todo ()
+(* Compile unitary operation *)
+let compile_uop (cs : compile_state) (op : Qasm.uop): compile_state = todo ()
 
-let compile_stmt (env : compile_state) (stmt : Qasm.stmt) : compile_state = match stmt with
+let compile_stmt (cs : compile_state) (stmt : Qasm.stmt) : compile_state = match stmt with
   (* Compile register declaration *)
-  | Qasm.Qreg (name, sz) -> compile_reg_decl env name sz
+  | Qasm.Qreg (name, sz) -> let addrs' = compile_reg_decl cs.env.addrs name sz in
+    {
+      env = {
+        funcs = cs.env.funcs;
+        (* Only update the addresses! *)
+        addrs = addrs';
+      };
+      gates = cs.gates;
+    }
   (* Compile gate declaration *)
-  | GateDecl (name, params, targets, body) -> compile_gate_decl env name params targets body
+  | GateDecl (name, params, targets, body) -> compile_gate_decl cs name params targets body
   (* Compile uop *)
-  | Qasm.Qop (Qasm.Q_uop uop) -> compile_uop env uop
+  | Qasm.Qop (Qasm.Q_uop uop) -> compile_uop cs uop
   | _ -> todo ()
 
 let compile' (prog : Qasm.t) : Circuit.t =
