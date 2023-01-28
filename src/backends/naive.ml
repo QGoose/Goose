@@ -1,10 +1,19 @@
 (** A naive simulator for quantum circuits *)
 
 open Simulation
+open Utils
 
 (** A simple quantum circuit simulation backend based on Qubit-Wise Multiplication. *)
 module NaiveBackend = struct
   type qstate = Complex.t array
+
+  let print_state (out: out_channel) (state: qstate) =
+    let len = Array.length state in
+    let print_cpx cpx =
+      let { Complex.re; im; } = cpx in
+      Printf.sprintf "%.3f + %.3fi (%.3f)" re im (Complex.norm2 cpx)
+    in
+      Array.iteri  (fun i s -> Printf.fprintf out "|%s> = %s\n" (int2bin i (log2 len)) (print_cpx s)) state
 
   (** Returns the indices of the state amplitudes required for the ith iteration of a gate on target t. *)
   let iteration_indices (i : int) (t : int) : int * int =
@@ -54,7 +63,7 @@ module NaiveBackend = struct
         polar (sin (theta /. 2.)) ((phi -. lambda) /. 2.), polar (cos (theta /. 2.)) ((lambda +. phi) /. 2.)
       )
 
-  (* Applies a gate to a state vector using QWM (2^(n-1) iterations). *)
+  (** Applies a gate to a state vector using QWM (2^(n-1) iterations). *)
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in
     let (a, b, c, d) = matrix_for_gate g.kind in

@@ -8,6 +8,8 @@ module type BACKEND = sig
   val init : int -> qstate
 
   val apply_gate : Circuit.gate -> qstate -> unit
+
+  val print_state: out_channel -> qstate -> unit
 end
 
 (** Given a [BACKEND], produces a quantum circuit simulator by defining the [run] function. *)
