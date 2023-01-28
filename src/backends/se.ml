@@ -1,11 +1,16 @@
 open Symbolic
 open Simulation
+open Utils
 
 (**
    A Symbolic backend to simulate quantum circuits
 *)
 module SBackend = struct
   type qstate = Expr.t array
+
+  let print_state (out: out_channel) (state: qstate) =
+    let len = Array.length state in
+    Array.iteri  (fun i s -> Printf.fprintf out "|%s> = %s\n" (int2bin i (log2 len)) (Expr.repr s)) state   
 
   (* Returns the indices of the state amplitudes required for the ith iteration of a gate on target t. *)
   let iteration_indices (i : int) (t : int) : int * int =
