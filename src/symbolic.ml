@@ -99,3 +99,70 @@ module Expr = struct
     | Var v -> Var v
     | CustomSymbol s -> CustomSymbol s
 end
+
+let fresh =
+  let count = ref (-1) in
+  fun () -> incr count; !count
+
+let mk_symbol i =
+  Expr.CustomSymbol (Printf.sprintf "x_%d" i)
+
+module EExpr = struct
+  type t =
+    | Ei
+    | Epi
+    | Evar of int
+    | Ecst of int
+    | Esym of string
+    | Ebop of Qasm.binaryop * int * int
+    | Euop of Qasm.unaryop * int
+
+  let repr (e : t) : Expr.t =
+    match e with
+    | Ei -> I
+    | Epi -> Pi
+    | Evar v -> Var v
+    | Esym s -> CustomSymbol s
+    | Ecst c -> Cst c
+    | Ebop (op, i1, i2) -> Bop (op, mk_symbol i1, mk_symbol i2)
+    | Euop (op, i) -> Uop (op, mk_symbol i)
+end
+
+module LExpr = struct
+  type t = { bindings : (string * Expr.t) list; value : Expr.t }
+  let print out { bindings; value } =
+    List.iter (fun (x, e) ->
+      Printf.fprintf out "let %s = %s in\n" x (Expr.repr e)
+    ) bindings;
+    Printf.printf "%s\n" (Expr.repr value)
+end
+
+module Egraph = struct
+  type t = (int, EExpr.t) Hashtbl.t
+  let world : t = Hashtbl.create 17
+
+  let find_eexpr (e : EExpr.t) =
+    Hashtbl.to_seq world
+    |> Seq.find (fun (_, exp) -> exp = e)
+    |> Option.map fst
+
+  let register (e : EExpr.t) =
+    match find_eexpr e with
+    | Some id -> id
+    | None ->
+      let id = fresh () in
+      Hashtbl.add world id e; id
+
+  let repr (id : int) : LExpr.t =
+    let rec collect acc (l : (int * EExpr.t) list) =
+      match l with
+      | [] -> assert false
+      | (i, v)::_ when i = id -> LExpr.{ bindings = List.rev acc; value = EExpr.repr v }
+      | (i, v)::l -> collect ((Printf.sprintf "x_%d" i, EExpr.repr v)::acc) l
+    in
+    world
+    |> Hashtbl.to_seq
+    |> List.of_seq
+    |> List.sort (fun (x, _) (y, _) -> compare x y)
+    |> collect []
+end
