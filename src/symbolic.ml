@@ -117,6 +117,15 @@ module EExpr = struct
     | Ebop of Qasm.binaryop * int * int
     | Euop of Qasm.unaryop * int
 
+  (** Symbolic product. *)
+  let ( *! ) x y = Ebop (Qasm.MUL, x, y)
+
+  (** Symbolic sum. *)
+  let ( +! ) x y = Ebop (Qasm.ADD, x, y)
+
+  (** Symbolic negation. *)
+  let neg x = Euop (Qasm.NEG, x)
+
   let repr (e : t) : Expr.t =
     match e with
     | Ei -> I

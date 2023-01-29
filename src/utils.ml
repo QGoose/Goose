@@ -11,3 +11,17 @@ let int2bin n bits =
 let rec log2 x =
   if x <= 1 then 0
   else 1 + log2 (x lsr 1)
+
+(** Returns the indices of the state amplitudes required for the ith iteration of a gate on target t. *)
+let iteration_indices (i : int) (t : int) : int * int =
+  let mask = (1 lsl t) - 1 in
+  let notMask = lnot mask in
+  let i1 = (i land mask) lor ((i land notMask) lsl 1) in
+  let i2 = i1 lor (1 lsl t) in
+  (i1, i2)
+  
+(** Check if an iteration should execute based on the controls of the gate. *)
+let controls_check (state_index: int) (controls: Circuit.adr list): bool =
+  let check (Circuit.A c) = (1 lsl c) land state_index > 0 in
+  List.(fold_left (&&) true (map check controls))
+    

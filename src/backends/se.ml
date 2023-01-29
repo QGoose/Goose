@@ -4,6 +4,56 @@ open Symbolic
 open Simulation
 open Utils
 
+module SEgraphBackend = struct 
+  type qstate = int array
+  type matrix = int * int * int * int
+
+  let init qbits : qstate = 
+    let len = 1 lsl qbits in
+    let ids = Array.make len 0 in
+    for i = 0 to len - 1 do
+      ids.(i) <- Egraph.register (EExpr.Evar i)
+    done;
+    ids
+
+  let cpx_0 = Egraph.register (EExpr.Ecst 0)
+  let cpx_1 = Egraph.register (EExpr.Ecst 1)
+  let cpx_2 = Egraph.register (EExpr.Ecst 2)
+  let cpx_pi = Egraph.register (EExpr.Epi)
+  let cpx_i = Egraph.register (EExpr.Ei)
+  let cpx_2_pi = Egraph.register EExpr.(cpx_2 *! cpx_pi)
+  let cpx_sqrt_2 = Egraph.register EExpr.(Euop (SQRT, cpx_2))
+  let cpx_inv_sqrt_2 = Egraph.register EExpr.(Euop (INV, cpx_sqrt_2))
+  let cpx_pow_2 m = Egraph.register EExpr.(Ebop (POW, cpx_2, (Egraph.register (Ecst m))))
+  let cpx_omega m = Egraph.register EExpr.(Euop (EXP, Egraph.register (Ebop (DIV, Egraph.register (cpx_2_pi *! cpx_i), cpx_pow_2 m))))
+
+  let matrix_for_gate (g : Circuit.gate_kind) : matrix =
+    match g with
+    | X -> (cpx_0, cpx_1, cpx_1, cpx_0)
+    | Z -> (cpx_1, cpx_0, cpx_0, Egraph.register (EExpr.neg cpx_1))
+    | H -> (cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, Egraph.register (EExpr.neg cpx_inv_sqrt_2))
+    | Rm m -> (cpx_0, cpx_0, cpx_0, cpx_omega m)
+    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo ()
+  
+  (** Applies a gate to a state vector using symbolic QWM (2^(n-1) iterations). *)
+  let apply_gate (g : Circuit.gate) (state : qstate) = 
+    let iterations = Array.length state / 2 in
+    let (a, b, c, d) = matrix_for_gate g.kind in
+    let (A t) = g.target in
+
+    for i = 0 to iterations - 1 do
+      let (i1, i2) = iteration_indices i t in
+      let c1 = state.(i1) in
+      let c2 = state.(i2) in
+      let check = controls_check i1 g.controls in
+      if check then begin
+        state.(i1) <- Egraph.register EExpr.(Egraph.register (a *! c1) +! Egraph.register (b *! c2));
+        state.(i2) <- Egraph.register EExpr.(Egraph.register (c *! c1) +! Egraph.register (d *! c2));
+      end
+    done
+  
+end
+
 (**
    A Symbolic backend to simulate quantum circuits
 *)
@@ -14,14 +64,6 @@ module SBackend = struct
     let len = Array.length state in
     Array.iteri  (fun i s -> Printf.fprintf out "|%s> = %s\n" (int2bin i (log2 len)) (Expr.repr s)) state   
 
-  (* Returns the indices of the state amplitudes required for the ith iteration of a gate on target t. *)
-  let iteration_indices (i : int) (t : int) : int * int =
-    let mask = (1 lsl t) - 1 in
-    let notMask = lnot mask in
-    let i1 = (i land mask) lor ((i land notMask) lsl 1) in
-    let i2 = i1 lor (1 lsl t) in
-    (i1, i2)
-
   (** Initialises a state vector given a number of qubits. *)
   let init qbits =
     let len = 1 lsl qbits in
@@ -31,11 +73,6 @@ module SBackend = struct
     (* effectfully set the |00...0> entry to 1 *)
     (* Array.set state 0 (Expr.Cst (Complex.one)); *)
     state
-
-  (** Check if an iteration should execute based on the controls of the gate. *)
-  let controls_check (state_index: int) (controls: Circuit.adr list): bool =
-    let check (Circuit.A c) = (1 lsl c) land state_index > 0 in
-    List.(fold_left (&&) true (map check controls))
 
   type matrix = Expr.t * Expr.t * Expr.t * Expr.t
 
