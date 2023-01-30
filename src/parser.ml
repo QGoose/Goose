@@ -6,6 +6,8 @@ open Qasm
 let id x = Id x
 let nnint x = Nnint x
 
+let optional p = (p => Option.some) <|> return None
+
 let non_zero =
   satisfy (function '1'..'9' -> true | _ -> false)
 
@@ -26,8 +28,7 @@ let (let*) = (>>=)
 let parse_idx =
   between (token "[") (token "]") parse_nnint
 
-let parse_opt_idx =
-  parse_idx => Option.some <|> return None
+let parse_opt_idx = optional parse_idx
 
 let parse_arg =
   let* id = parse_id in
@@ -115,10 +116,15 @@ let parse_stmt =
   let gate =
     let* _  = token "gate" in
     let* id = parse_id in
-    let* l1 = between (token "(") (token ")") (sep_by parse_id (token ",")) in
+    let* l1 = optional (between (token "(") (token ")") (sep_by parse_id (token ","))) in
     let* l2 = sep_by1 parse_id (token ",") in
     let* l3 = between (token "{") (token "}") (many gop) in
-    return (GateDecl {name = id; params = l1; qargs = l2; gates = l3; })
+    (* Hack: collapse a missing param list to an empty list *)
+    let l1' = match l1 with
+      | Some l -> l
+      | None -> []
+    in
+    return (GateDecl {name = id; params = l1'; qargs = l2; gates = l3; })
   in
   let measure =
     let* _ = token "measure" << space in
