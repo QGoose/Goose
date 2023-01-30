@@ -95,10 +95,15 @@ let parse_stmt =
   in
   let uop_app =
     let* id = parse_id in
-    let* l1 = between (token "(") (token ")") (sep_by parse_expr (token ",")) in
+    let* l1 = optional (between (token "(") (token ")") (sep_by parse_expr (token ","))) in
     let* l2 = sep_by1 parse_arg (token ",") in
     let* _ = token ";" in
-    return (App (id, l1, l2))
+    (* Hack: collapse a missing param list to an empty list *)
+    let l1' = match l1 with
+      | Some l -> l
+      | None -> []
+    in
+    return (App (id, l1', l2))
   in
   let uop =
     choice [
