@@ -48,7 +48,7 @@ let resolve (addrs : addresses) (name : string) (offset : int) : Circuit.adr =
 let rec eval_float (expr : Qasm.expr) : float = match expr with
   | E_cst x -> x
   (* TODO *)
-  | E_int _nnint -> failwith "unimplemented: eval `nnint`"
+  | E_int Qasm.Nnint n -> float_of_int n
   | E_Pi -> Float.pi
   (* TODO *)
   | E_id _id -> failwith "unimplemented: eval `id`"

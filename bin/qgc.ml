@@ -28,7 +28,7 @@ let str_to_output_format (s: string) = match s with
 
 let emitter (out_fmt : output_format) : Circuit.t -> string =
   match out_fmt with
-  | GooseIR -> Utils.todo ()
+  | GooseIR -> Circuit.string_of_circuit
   | NaiveSim -> Utils.todo ()
   | CSeSim -> Utils.todo ()
 
@@ -48,7 +48,7 @@ let with_in_fmt (args : args_builder) (in_fmt : input_format) : args_builder =
   | Some _ -> failwith "already have an input format"
 
 let with_out_fmt (args : args_builder) (out_fmt : output_format) : args_builder =
-  match args.in_fmt with
+  match args.out_fmt with
   | None -> {
       in_fmt = args.in_fmt;
       out_fmt = Some out_fmt;
@@ -57,13 +57,15 @@ let with_out_fmt (args : args_builder) (out_fmt : output_format) : args_builder 
   | Some _ -> failwith "already have an output format"
 
 let with_src_file (args : args_builder) (src_file : source_file) : args_builder =
-  match args.in_fmt with
+  match args.src_file with
   | None -> {
       in_fmt = args.in_fmt;
       out_fmt = args.out_fmt;
       src_file = Some src_file;
     }
-  | Some _ -> failwith "already have a source file"
+  | Some SrcFile orig ->
+    let SrcFile src_file = src_file in
+    failwith (Printf.sprintf "Tried to use source file `%s`, but already have source file `%s`." src_file orig)
 
 type arguments = {
   in_fmt : input_format;
@@ -110,8 +112,10 @@ let parse_arg (state : expecting_kind * args_builder) (arg : string) : expecting
     (Any, new_args)
 
 let parse_args : arguments =
+  (* Remove the first element, which is just this binary *)
+  let cli_args = Array.to_seq Sys.argv |> Seq.drop 1 in
   let (empty_args : args_builder) = { in_fmt = None; out_fmt = None; src_file = None; } in
-  let (_, final_args) = Array.fold_left parse_arg (Any, empty_args) Sys.argv in
+  let (_, final_args) = Seq.fold_left parse_arg (Any, empty_args) cli_args in
   builder_to_arguments final_args
 
 let () =
