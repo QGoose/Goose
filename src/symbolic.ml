@@ -54,11 +54,11 @@ module Expr = struct
     | Uop (op, e) ->
       Printf.sprintf "(%s %s)" (Qasm.string_of_unary op) (repr e)
     | Cst c ->
-      Printf.sprintf "%d" c
+      Printf.sprintf "Cst %d" c
     | Pi -> Printf.sprintf "pi"
     | I -> Printf.sprintf "i"
     | Var v ->
-      Printf.sprintf "%d" v
+      Printf.sprintf "Var %d" v
     | CustomSymbol s -> s
 
   (** Reduces an expression by matching against reduction rules. *)
@@ -162,6 +162,8 @@ module Egraph = struct
       let id = fresh () in
       Hashtbl.add world id e; id
 
+  let get (id : int) : EExpr.t = Hashtbl.find world id
+
   let repr (id : int) : LExpr.t =
     let rec collect acc (l : (int * EExpr.t) list) =
       match l with
@@ -174,4 +176,95 @@ module Egraph = struct
     |> List.of_seq
     |> List.sort (fun (x, _) (y, _) -> compare x y)
     |> collect []
+
+  let repr_all () =
+    world
+    |> Hashtbl.to_seq
+    |> List.of_seq
+    |> List.sort (fun (x, _) (y, _) -> compare x y)
+    |> List.map (fun (i, v) -> (i, EExpr.repr v))
+
+  let is_mul (id : int) : (int * int) option = 
+    match (get id) with
+    | Ebop (Qasm.MUL, x1, x2) -> Some (x1, x2)
+    | _ -> None
+  
+  let is_neg (id : int) : int option = 
+    match (get id) with
+    | Euop (Qasm.NEG, x) -> Some x
+    | _ -> None
+
+  let is_sqrt (id : int) : int option = 
+    match (get id) with
+    | Euop (Qasm.SQRT, x) -> Some x
+    | _ -> None
+
+  let mk_cst c = register (Ecst c)
+  let mk_var v = register (Evar v)
+  let mk_custom s = register (Esym s)
+  
+  let rec mk_add x1 x2 = 
+    if x1 = x2 then mk_mul (mk_cst 2) x1
+    else if x1 = mk_cst 0 then x2
+    else if x2 = mk_cst 0 then x1
+    else match (is_mul x1, is_mul x2) with
+    | Some (a, b), Some (c, d) when a = c -> mk_mul a (mk_add b d)
+    | Some (a, b), Some (c, d) when a = d -> mk_mul a (mk_add b c)
+    | Some (a, b), Some (c, d) when b = c -> mk_mul b (mk_add a d)
+    | Some (a, b), Some (c, d) when b = d -> mk_mul b (mk_add a c)
+    | _ -> register (Ebop (ADD, x1, x2))
+
+  and mk_mul x1 x2 = 
+    let c0 = mk_cst 0 in
+    let c1 = mk_cst 1 in
+    if x1 = x2 then mk_pow x1 (mk_cst 2)
+    else if x1 = c0 || x2 = c0 then c0
+    else if x1 = c1 then x2 
+    else if x2 = c1 then x1
+    else register (Ebop (MUL, x1, x2))
+    
+  and mk_sub x1 x2 = 
+    let c0 = mk_cst 0 in
+    if x1 = x2 then c0
+    else if x1 = c0 then mk_neg x2
+    else if x2 = c0 then x1
+    else match (is_mul x1, is_mul x2) with
+    | Some (a, b), Some (c, d) when a = c -> mk_mul a (mk_sub b d)
+    | Some (a, b), Some (c, d) when a = d -> mk_mul a (mk_sub b c)
+    | Some (a, b), Some (c, d) when b = c -> mk_mul b (mk_sub a d)
+    | Some (a, b), Some (c, d) when b = d -> mk_mul b (mk_sub a c)
+    | _ -> register (Ebop (SUB, x1, x2))
+
+  and mk_div x1 x2 = 
+    let c0 = mk_cst 0 in
+    let c1 = mk_cst 1 in
+    if x1 = c0 then c0
+    else if x2 = c1 then x1
+    else if x1 = c1 then mk_inv x2
+    else register (Ebop (DIV, x1, x2))
+
+  and mk_pow x1 x2 = 
+    let c0 = mk_cst 0 in
+    let c1 = mk_cst 1 in
+    if x1 = c0 then c0 
+    else if x2 = c0 then c1
+    else if x1 = c1 then c1
+    else if x2 = c1 then x1
+    else register (Ebop (POW, x1, x2))
+
+  and mk_sqrt x = register (Euop (SQRT, x))
+  and mk_exp x = register (Euop (EXP, x))
+  
+  and mk_inv x = 
+    let c1 = mk_cst 1 in
+    let c2 = mk_cst 2 in
+    if x = c1 then c1 
+    else match (is_sqrt x) with 
+    | Some sqrted when sqrted = c2 -> mk_custom "SQRT1_2"
+    | _ -> register (Euop (INV, x))
+
+  and mk_neg x = 
+    let c0 = mk_cst 0 in
+    if x = c0 then c0
+    else register (Euop (NEG, x))
 end

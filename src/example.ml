@@ -63,9 +63,12 @@ let entanglement_res = NaiveSimulator.run (entanglement 3)
 
 let entanglement_se_res = SE_Engine.run (entanglement 3)
 
+let entanglement_se_egraph_res = SE_Egraph_Engine.run (entanglement 3)
+
 let qft3_res = NaiveSimulator.run (qft 3);;
 
 let qft3_se_res = SE_Engine.run (qft 3);;
 
 let grovers_res = NaiveSimulator.run (groversSearch 3 [0; 1] 3);;
 let grovers_se_res = SE_Engine.run (groversSearch 3 [0; 1] 3);;
+let grovers_se_egraph_res = SE_Egraph_Engine.run (groversSearch 3 [0; 1] 3);;

@@ -25,3 +25,6 @@ let controls_check (state_index: int) (controls: Circuit.adr list): bool =
   let check (Circuit.A c) = (1 lsl c) land state_index > 0 in
   List.(fold_left (&&) true (map check controls))
     
+let lines file =
+  In_channel.with_open_bin file In_channel.input_all
+  |> String.split_on_char '\n'
