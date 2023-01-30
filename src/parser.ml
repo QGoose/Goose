@@ -118,7 +118,7 @@ let parse_stmt =
     let* l1 = between (token "(") (token ")") (sep_by parse_id (token ",")) in
     let* l2 = sep_by1 parse_id (token ",") in
     let* l3 = between (token "{") (token "}") (many gop) in
-    return (GateDecl {name = id; params1 = l1; params2 = l2; gates = l3; })
+    return (GateDecl {name = id; params = l1; qargs = l2; gates = l3; })
   in
   let measure =
     let* _ = token "measure" << space in

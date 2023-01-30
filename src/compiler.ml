@@ -72,8 +72,8 @@ let rec eval_float (expr : Qasm.expr) : float = match expr with
 
 (* TODO: this should be a lower-level representation than that in qasm.ml *)
 type gate_abstraction = {
-  params1 : Qasm.id list;
-  params2 : Qasm.id list;
+  params : Qasm.id list;
+  qargs : Qasm.id list;
   gates : Qasm.gop list;
 }
 
@@ -117,8 +117,8 @@ let compile_reg_decl (addrs : addresses) (name : Qasm.id) (sz : Qasm.nnint) : ad
 (* Compile gate declaration, add it to the environment *)
 let compile_gate_decl (cs : compile_state) (decl : Qasm.gate_decl) : compile_state =
   let abstract_gate = {
-    params1 = decl.params1;
-    params2 = decl.params2;
+    params = decl.params;
+    qargs = decl.qargs;
     gates = decl.gates;
   } in
   let _ = Hashtbl.add cs.env.funcs decl.name abstract_gate in

@@ -25,8 +25,8 @@ and stmt =
 
 and gate_decl = {
   name : id;
-  params1 : id list;
-  params2 : id list;
+  params : id list;
+  qargs : id list;
   gates : gop list;
 }
 
@@ -100,9 +100,9 @@ let string_of_list ?(sep = ", ") (str : 'a -> string) (l : 'a list) =
 let rec string_of_stmt = function
   | Qreg (id, n) -> Printf.sprintf "qreg %s[%d];" (string_of_id id) (int_of_nnint n)
   | Creg (id, n) -> Printf.sprintf "creg %s[%d];" (string_of_id id) (int_of_nnint n)
-  | GateDecl { name = Id name; params1 = params1; params2 = params2; gates = gates; } ->
+  | GateDecl { name = Id name; params = params; qargs = qargs; gates = gates; } ->
     Printf.sprintf "%s (%s) %s {\n%s\n}" name
-      (string_of_ids params1) (string_of_ids params2)
+      (string_of_ids params) (string_of_ids qargs)
       (string_of_list ~sep:", " string_of_gop gates)
   | Qop q -> string_of_qop q
   | _ -> Utils.todo ()
