@@ -33,27 +33,32 @@ let resolve (addrs : addresses) (name : string) (offset : int) : Circuit.adr =
     A (reg.first + offset)
 
 (* let rec collect_gate_decls' (f : Qasm.stmt list) decls = match f with
-  | [] -> ()
-  | GateDecl (name, _params, _targets, _body) :: tail ->
+   | [] -> ()
+   | GateDecl (name, _params, _targets, _body) :: tail ->
     let body = () in
     let _ = Hashtbl.add decls name body in
     collect_gate_decls' tail decls
-  | _ :: tail -> collect_gate_decls' tail decls *)
+   | _ :: tail -> collect_gate_decls' tail decls *)
 
 (* let collect_gate_decls (f : Qasm.stmt list) =
-  let gate_decls = Hashtbl.create 8 in
-  let _ = collect_gate_decls' f gate_decls in
-  gate_decls *)
+   let gate_decls = Hashtbl.create 8 in
+   let _ = collect_gate_decls' f gate_decls in
+   gate_decls *)
 
 let eval_float (_expr : Qasm.expr) : float = todo ()
 
-type gate = unit
+(* TODO: this should be a lower-level representation than that in qasm.ml *)
+type gate_abstraction = {
+  params1 : Qasm.id list;
+  params2 : Qasm.id list;
+  gates : Qasm.gop list;
+}
 
 type environment = {
   (* Register name bindings *)
   addrs: addresses;
-  (* Gate abstractions *)
-  funcs: (string, gate) Hashtbl.t;
+  (* Gate abstractions: map abstract gate names to their definitions *)
+  funcs: (Qasm.id, gate_abstraction) Hashtbl.t;
 }
 
 (*  Create a new empty environment *)
@@ -86,12 +91,20 @@ let compile_reg_decl (addrs : addresses) (name : Qasm.id) (sz : Qasm.nnint) : ad
   } in
   addrs'
 
-(* Compile gate declaration *)
-let compile_gate_decl (_cs : compile_state) (_name : Qasm.id) (_params : Qasm.id list)
-    (_targets : Qasm.id list) (_body : Qasm.gop list) : compile_state = todo ()
+(* Compile gate declaration, add it to the environment *)
+let compile_gate_decl (cs : compile_state) (decl : Qasm.gate_decl) : compile_state =
+  let abstract_gate = {
+    params1 = decl.params1;
+    params2 = decl.params2;
+    gates = decl.gates;
+  } in
+  let _ = Hashtbl.add cs.env.funcs decl.name abstract_gate in
+  cs
+
+let subst_args (_abstract_gate : gate_abstraction) (_args1 : Qasm.expr list) (_args2 : Qasm.arg list) : Qasm.gop list = todo ()
 
 (* Turn a uop into (possibly a list of) Circuit.gate *)
-let compile_uop (addrs : addresses) (uop : Qasm.uop) : Circuit.gate list = match uop with
+let rec compile_uop (env: environment) (uop : Qasm.uop) : Circuit.gate list = match uop with
   | U (theta :: phi :: lambda :: [], arg) ->
     let kind : Circuit.gate_kind = U {
         theta = eval_float theta;
@@ -102,7 +115,7 @@ let compile_uop (addrs : addresses) (uop : Qasm.uop) : Circuit.gate list = match
       (* TODO: Act on all qubits in a register? *)
       | A_id (Id _tgt_reg, None) -> failwith "Unimplemented: map gate over register"
       (* Act on a single qubit in a register at the given offset *)
-      | A_id (Id tgt_reg, Some tgt_offset) -> resolve addrs tgt_reg (Qasm.int_of_nnint tgt_offset)
+      | A_id (Id tgt_reg, Some tgt_offset) -> resolve env.addrs tgt_reg (Qasm.int_of_nnint tgt_offset)
     in
     let (gate : Circuit.gate) = {
       target = tgt;
@@ -114,8 +127,8 @@ let compile_uop (addrs : addresses) (uop : Qasm.uop) : Circuit.gate list = match
   | U (_, _) -> failwith "Illegal arbitrary single qubit unitary"
   | CX (A_id (Id _src_reg, None), A_id (Id _tgt_reg, None)) -> todo ()
   | CX (A_id (Id src_reg, Some src_offset), A_id (Id tgt_reg, Some tgt_offset)) ->
-    let tgt = resolve addrs tgt_reg (Qasm.int_of_nnint tgt_offset) in
-    let src = resolve addrs src_reg (Qasm.int_of_nnint src_offset) in
+    let tgt = resolve env.addrs tgt_reg (Qasm.int_of_nnint tgt_offset) in
+    let src = resolve env.addrs src_reg (Qasm.int_of_nnint src_offset) in
     {
       target = tgt;
       kind = X;
@@ -123,7 +136,16 @@ let compile_uop (addrs : addresses) (uop : Qasm.uop) : Circuit.gate list = match
     } :: []
   (* TODO: actual error message: trying to map over something that can't be mapped over. *)
   | CX _ -> failwith "Illegal control operation"
-  | App (_, _, _) -> todo()
+  | App (name, args1, args2) ->
+    let abstract_gate = Hashtbl.find env.funcs name in
+    subst_args abstract_gate args1 args2 |>
+    List.map (compile_gop env) |>
+    List.flatten
+
+and compile_gop (env : environment) (gop : Qasm.gop) : Circuit.gate list = match gop with
+  (* Simply ignore barriers *)
+  | G_barrier _ -> []
+  | G_uop uop -> compile_uop env uop
 
 let compile_stmt (cs : compile_state) (stmt : Qasm.stmt) : compile_state = match stmt with
   (* Compile register declaration *)
@@ -137,9 +159,9 @@ let compile_stmt (cs : compile_state) (stmt : Qasm.stmt) : compile_state = match
       gates = cs.gates;
     }
   (* Compile gate declaration *)
-  | GateDecl (name, params, targets, body) -> compile_gate_decl cs name params targets body
+  | GateDecl decl -> compile_gate_decl cs decl
   (* Compile uop *)
-  | Qasm.Qop (Qasm.Q_uop uop) -> let new_gates = compile_uop cs.env.addrs uop in
+  | Qasm.Qop (Qasm.Q_uop uop) -> let new_gates = compile_uop cs.env uop in
     {
       env = cs.env;
       gates = cs.gates @ new_gates;

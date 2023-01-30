@@ -13,7 +13,7 @@ and stmt =
   (* Classical register *)
   | Creg of id * nnint
   (* Gate declaration *)
-  | GateDecl of id * id list * id list * gop list
+  | GateDecl of gate_decl
   (* Quantum operator *)
   | Qop of qop
   (* Conditions *)
@@ -22,6 +22,13 @@ and stmt =
   | Opaque of id * id list * id list
   (* Barrier *)
   | Barrier of arg list
+
+and gate_decl = {
+  name : id;
+  params1 : id list;
+  params2 : id list;
+  gates : gop list;
+}
 
 (** Gate operators *)
 and gop =
@@ -93,10 +100,10 @@ let string_of_list ?(sep = ", ") (str : 'a -> string) (l : 'a list) =
 let rec string_of_stmt = function
   | Qreg (id, n) -> Printf.sprintf "qreg %s[%d];" (string_of_id id) (int_of_nnint n)
   | Creg (id, n) -> Printf.sprintf "creg %s[%d];" (string_of_id id) (int_of_nnint n)
-  | GateDecl (Id name, args1, args2, body) ->
+  | GateDecl { name = Id name; params1 = params1; params2 = params2; gates = gates; } ->
     Printf.sprintf "%s (%s) %s {\n%s\n}" name
-      (string_of_ids args1) (string_of_ids args2)
-      (string_of_list ~sep:", " string_of_gop body)
+      (string_of_ids params1) (string_of_ids params2)
+      (string_of_list ~sep:", " string_of_gop gates)
   | Qop q -> string_of_qop q
   | _ -> Utils.todo ()
 
@@ -161,7 +168,7 @@ and string_of_arg (A_id (Id id, idx)) =
 
 
 and string_of_ids l =
-    String.concat ", " (List.map (fun (Id x) -> x) l)
+  String.concat ", " (List.map (fun (Id x) -> x) l)
 
 and string_of_stmts tab l =
   let l' = List.map string_of_stmt l in

@@ -53,7 +53,7 @@ and parse_atom input =
     token "exp" >> (parens parse_expr) => (fun x -> E_uop (EXP, x));
     token "sqrt" >> (parens parse_expr) => (fun x -> E_uop (SQRT, x));
     parse_const
-   ] input
+  ] input
 and parse_const input =
   choice [
     token "pi" >> return E_Pi;
@@ -76,7 +76,7 @@ let parse_stmt =
     let* _  = token ";" in
     return (Creg (id, nn))
   in
-  
+
   let uop_u =
     let* _ = token "U" in
     let* l = between (token "(") (token ")") (sep_by parse_expr (token ",")) in
@@ -118,7 +118,7 @@ let parse_stmt =
     let* l1 = between (token "(") (token ")") (sep_by parse_id (token ",")) in
     let* l2 = sep_by1 parse_id (token ",") in
     let* l3 = between (token "{") (token "}") (many gop) in
-    return (GateDecl (id, l1, l2, l3))
+    return (GateDecl {name = id; params1 = l1; params2 = l2; gates = l3; })
   in
   let measure =
     let* _ = token "measure" << space in
