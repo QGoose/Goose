@@ -45,7 +45,30 @@ let resolve (addrs : addresses) (name : string) (offset : int) : Circuit.adr =
    let _ = collect_gate_decls' f gate_decls in
    gate_decls *)
 
-let eval_float (_expr : Qasm.expr) : float = todo ()
+let rec eval_float (expr : Qasm.expr) : float = match expr with
+  | E_cst x -> x
+  (* TODO *)
+  | E_int _nnint -> failwith "unimplemented: eval `nnint`"
+  | E_Pi -> Float.pi
+  (* TODO *)
+  | E_id _id -> failwith "unimplemented: eval `id`"
+  | E_bop (binop, e1, e2) -> let binop = match binop with
+      | ADD -> ( +. )
+      | MUL -> ( *. )
+      | SUB -> ( -. )
+      | DIV -> ( /. )
+      | POW -> ( ** )
+    in binop (eval_float e1) (eval_float e2)
+  | E_uop (uop, e') -> let uop = match uop with
+      | SIN -> Float.sin
+      | COS -> Float.cos
+      | TAN -> Float.tan
+      | EXP -> Float.exp
+      | NEG -> Float.neg
+      | LN -> Float.log
+      | SQRT -> Float.sqrt
+      | INV -> ( /. ) 1.
+    in uop (eval_float e')
 
 (* TODO: this should be a lower-level representation than that in qasm.ml *)
 type gate_abstraction = {
