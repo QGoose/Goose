@@ -46,6 +46,7 @@ and parse_term input = chainl1 parse_factor (mul <|> div) input
 and parse_factor input = (parens parse_expr <|> parse_atom) input
 and parse_atom input = 
   choice [
+    parens parse_expr;
     token "-" >> parse_atom => (fun x -> E_uop (NEG, x));
     token "ln" >> (parens parse_expr) => (fun x -> E_uop (LN, x));
     token "sin" >> (parens parse_expr) => (fun x -> E_uop (SIN, x));
