@@ -179,10 +179,17 @@ let parse_stmt =
 let parse_string s =
   LazyStream.of_string s |> parse_stmt
 
+let parse_version =
+  let* _ = token "OPENQASM" << space in
+  let* _ = token "2.0" in
+  let* _ = token ";" in
+  return (Nnint 2, Nnint 0)
+
 let parse_qasm =
+  let* version = parse_version in
   let* ast = many1 parse_stmt in
   return {
-    version = Qasm.(Nnint 0, Nnint 0);
+    version = version;
     body = ast;
   }
 
