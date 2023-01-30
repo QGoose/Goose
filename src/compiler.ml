@@ -1,7 +1,5 @@
 open Utils
 
-(* type mapping = ((string * int) * int) list *)
-
 (* Quantum register location and size within address space *)
 type register = {
   (* Address of the first qubit *)
@@ -31,19 +29,6 @@ let resolve (addrs : addresses) (name : string) (offset : int) : Circuit.adr =
     failwith "Illegal register offset"
   else
     A (reg.first + offset)
-
-(* let rec collect_gate_decls' (f : Qasm.stmt list) decls = match f with
-   | [] -> ()
-   | GateDecl (name, _params, _targets, _body) :: tail ->
-    let body = () in
-    let _ = Hashtbl.add decls name body in
-    collect_gate_decls' tail decls
-   | _ :: tail -> collect_gate_decls' tail decls *)
-
-(* let collect_gate_decls (f : Qasm.stmt list) =
-   let gate_decls = Hashtbl.create 8 in
-   let _ = collect_gate_decls' f gate_decls in
-   gate_decls *)
 
 let rec eval_float (expr : Qasm.expr) : float = match expr with
   | E_cst x -> x
@@ -124,7 +109,59 @@ let compile_gate_decl (cs : compile_state) (decl : Qasm.gate_decl) : compile_sta
   let _ = Hashtbl.add cs.env.funcs decl.name abstract_gate in
   cs
 
-let subst_args (_abstract_gate : gate_abstraction) (_args1 : Qasm.expr list) (_args2 : Qasm.arg list) : Qasm.gop list = todo ()
+let rec subst_args_expr (param_subs : (Qasm.id, Qasm.expr) Hashtbl.t)
+    (param : Qasm.expr) : Qasm.expr = match param with
+  | E_id id -> (match Hashtbl.find_opt param_subs id with
+      | Some e' -> e'
+      | None -> Qasm.E_id id)
+  | E_bop (binop, e1, e2) ->
+    let e1' = subst_args_expr param_subs e1 in
+    let e2' = subst_args_expr param_subs e2 in
+    E_bop (binop, e1', e2')
+  | E_uop (unop, e) ->
+    let e' = subst_args_expr param_subs e in
+    E_uop (unop, e')
+  (* Otherwise, do nothing *)
+  | e -> e
+
+let subst_args_arg (qarg_subs : (Qasm.id, Qasm.arg) Hashtbl.t) (arg : Qasm.arg) : Qasm.arg =
+  let A_id (id, idx) = arg in
+  match Hashtbl.find_opt qarg_subs id with
+  | Some A_id (id', idx') ->
+    (* TODO: Open question: what are the semantics of passing an indexed register into a gate that indexes that argument again? *)
+    let idx'' = match (idx, idx') with
+      | (None, None) -> None
+      | (Some idx', None) | (None, Some idx') -> Some idx'
+      | (Some _, Some _) -> failwith "The semantics of this program are unclear."
+    in A_id (id', idx'')
+  | None -> arg
+
+let subst_args_uop
+    (param_subs : (Qasm.id, Qasm.expr) Hashtbl.t)
+    (qarg_subs : (Qasm.id, Qasm.arg) Hashtbl.t)
+    (uop : Qasm.uop): Qasm.uop = match uop with
+  | U (exprs, arg) ->
+    let exprs' = List.map (subst_args_expr param_subs) exprs in
+    let arg' = subst_args_arg qarg_subs arg in
+    U (exprs', arg')
+  | CX (arg1, arg2) -> CX (subst_args_arg qarg_subs arg1, subst_args_arg qarg_subs arg2)
+  | App (name, inner_params, inner_qargs) ->
+    let inner_params' = List.map (subst_args_expr param_subs) inner_params in
+    let inner_qargs' = List.map (subst_args_arg qarg_subs) inner_qargs in
+    App (name, inner_params', inner_qargs')
+
+let subst_args_gop
+    (param_subs : (Qasm.id, Qasm.expr) Hashtbl.t)
+    (qarg_subs : (Qasm.id, Qasm.arg) Hashtbl.t)
+    (gop : Qasm.gop): Qasm.gop =
+  match gop with
+  | G_uop uop -> G_uop (subst_args_uop param_subs qarg_subs uop)
+  | x -> x
+
+let subst_args (abstract_gate : gate_abstraction) (params : Qasm.expr list) (qargs : Qasm.arg list) : Qasm.gop list =
+  let param_subs = Seq.zip (List.to_seq abstract_gate.params) (List.to_seq params) |> Hashtbl.of_seq in
+  let qarg_subs = Seq.zip (List.to_seq abstract_gate.qargs) (List.to_seq qargs) |> Hashtbl.of_seq in
+  List.map (subst_args_gop param_subs qarg_subs) abstract_gate.gates
 
 (* Turn a uop into (possibly a list of) Circuit.gate *)
 let rec compile_uop (env: environment) (uop : Qasm.uop) : Circuit.gate list = match uop with
