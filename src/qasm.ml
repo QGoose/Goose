@@ -105,7 +105,7 @@ let rec string_of_stmt = function
       (string_of_ids params) (string_of_ids qargs)
       (string_of_list ~sep:", " string_of_gop gates)
   | Qop q -> string_of_qop q
-  | _ -> Utils.todo ()
+  | _ -> Utils.todo "qasm string_of_statement other case"
 
 and string_of_qop (q : qop) =
   match q with
