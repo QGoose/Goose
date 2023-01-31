@@ -24,9 +24,9 @@ module SEgraphBackend = struct
         Printf.fprintf out "\n"
       ) state
 
-  let cpx_0 = Egraph.mk_cst 0
-  let cpx_1 = Egraph.mk_cst 1
-  let cpx_2 = Egraph.mk_cst 2
+  let cpx_0 = Egraph.mk_cst 0.
+  let cpx_1 = Egraph.mk_cst 1.
+  let cpx_2 = Egraph.mk_cst 2.
   let cpx_pi = Egraph.register (EExpr.Epi)
   let cpx_i = Egraph.register (EExpr.Ei)
   let cpx_2_pi = Egraph.mk_mul cpx_2 cpx_pi
@@ -39,7 +39,7 @@ module SEgraphBackend = struct
     | X -> (cpx_0, cpx_1, cpx_1, cpx_0)
     | Z -> (cpx_1, cpx_0, cpx_0, Egraph.mk_neg cpx_1)
     | H -> (cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, Egraph.mk_neg cpx_inv_sqrt_2)
-    | Rm m -> (cpx_1, cpx_0, cpx_0, cpx_omega m)
+    | Rm m -> (cpx_1, cpx_0, cpx_0, cpx_omega (Float.of_int m))
     | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo "matrix_for_gate case"
 
   (** Applies a gate to a state vector using symbolic QWM (2^(n-1) iterations). *)
@@ -84,25 +84,36 @@ module SBackend = struct
   type matrix = Expr.t * Expr.t * Expr.t * Expr.t
 
   let cpx_inv_sqrt_2 =
-    Expr.Uop (INV, Uop (SQRT, Cst 2))
+    Expr.Uop (INV, Uop (SQRT, Cst 2.))
 
   let cpx_2_pi =
-    Expr.(Cst 2 *! Pi)
+    Expr.(Cst 2. *! Pi)
 
   let cpx_pow_2 m =
-    Expr.Bop (POW, Cst 2, Cst m)
+    Expr.Bop (POW, Cst 2., Cst m)
 
   let cpx_omega m =
     Expr.(Uop (EXP, Bop (DIV, cpx_2_pi *! I, cpx_pow_2 m)))
 
+  let exp_i_of phi =
+    Expr.(Uop (EXP, I *! Cst phi))
+
   (** Returns the symbolic matrix corresponding to a gate kind. *)
   let matrix_for_gate (g : Circuit.gate_kind) : matrix =
     match g with
-    | X -> Expr.(Cst 0, Cst 1, Cst 1, Cst 0)
-    | Z -> Expr.(Cst 1, Cst 0, Cst 0, Cst (-1))
+    | X -> Expr.(Cst 0., Cst 1., Cst 1., Cst 0.)
+    | Z -> Expr.(Cst 1., Cst 0., Cst 0., Cst (-1.))
     | H -> Expr.(cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, neg cpx_inv_sqrt_2)
-    | Rm m -> Expr.(Cst 0, Cst 0, Cst 0, cpx_omega m)
-    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo "other matrix_for_gate case"
+    | Rm m -> Expr.(Cst 0., Cst 0., Cst 0., cpx_omega (Float.of_int m))
+    | U { theta = theta; phi = phi; lambda = lambda; } ->
+      let cos_theta_2 = Expr.(Uop (COS, Bop (DIV, Cst theta, Cst 2.))) in
+      let sin_theta_2 = Expr.(Uop (SIN, Bop (DIV, Cst theta, Cst 2.))) in
+      Expr.(
+        cos_theta_2,
+        Uop (NEG, (exp_i_of lambda) *! (sin_theta_2)),
+        (exp_i_of phi) *! (sin_theta_2),
+        (exp_i_of (lambda +. phi)) *! cos_theta_2
+      )
 
   (** Applies a gate to a state vector using symbolic QWM (2^(n-1) iterations). *)
   let apply_gate (g : Circuit.gate) (state : qstate) = 
