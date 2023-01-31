@@ -230,7 +230,6 @@ let compile_stmt (cs : compile_state) (stmt : Qasm.stmt) : compile_state = match
   | _ -> todo "Ignore other compile_statement cases"
 
 let compile (prog : Qasm.t) : Circuit.t =
-  let _ = Printf.printf "%s\n---------\n" (Qasm.string_of_qasm prog) in
   let init_state = {
     env = new_environment ();
     gates = [];
