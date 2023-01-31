@@ -19,10 +19,10 @@ module SEgraphBackend = struct
   let print_state (out: out_channel) (state: qstate) =
     let len = Array.length state in
     Array.iteri (fun i s -> 
-      Printf.fprintf out "|%s> = " (int2bin i (log2 len));
-      LExpr.print out (Egraph.repr s);
-      Printf.fprintf out "\n"
-    ) state      
+        Printf.fprintf out "|%s> = " (int2bin i (log2 len));
+        LExpr.print out (Egraph.repr s);
+        Printf.fprintf out "\n"
+      ) state
 
   let cpx_0 = Egraph.mk_cst 0
   let cpx_1 = Egraph.mk_cst 1
@@ -40,8 +40,8 @@ module SEgraphBackend = struct
     | Z -> (cpx_1, cpx_0, cpx_0, Egraph.mk_neg cpx_1)
     | H -> (cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, Egraph.mk_neg cpx_inv_sqrt_2)
     | Rm m -> (cpx_1, cpx_0, cpx_0, cpx_omega m)
-    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo ()
-  
+    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo "matrix_for_gate case"
+
   (** Applies a gate to a state vector using symbolic QWM (2^(n-1) iterations). *)
   let apply_gate (g : Circuit.gate) (state : qstate) = 
     let iterations = Array.length state / 2 in
@@ -58,7 +58,7 @@ module SEgraphBackend = struct
         state.(i2) <- Egraph.(mk_add (mk_mul c s1) (mk_mul d s2));
       end
     done
-  
+
 end
 
 (**
@@ -102,7 +102,7 @@ module SBackend = struct
     | Z -> Expr.(Cst 1, Cst 0, Cst 0, Cst (-1))
     | H -> Expr.(cpx_inv_sqrt_2, cpx_inv_sqrt_2, cpx_inv_sqrt_2, neg cpx_inv_sqrt_2)
     | Rm m -> Expr.(Cst 0, Cst 0, Cst 0, cpx_omega m)
-    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo ()
+    | U { theta = _theta; phi = _phi; lambda = _lambda; } -> Utils.todo "other matrix_for_gate case"
 
   (** Applies a gate to a state vector using symbolic QWM (2^(n-1) iterations). *)
   let apply_gate (g : Circuit.gate) (state : qstate) = 

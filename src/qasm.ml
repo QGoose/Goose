@@ -108,7 +108,7 @@ let rec string_of_stmt = function
       (string_of_list ~sep:", " string_of_gop gates)
   | Qop q -> string_of_qop q
   | Include f -> Printf.sprintf "include \"%s\"" f
-  | _ -> Utils.todo ()
+  | _ -> Utils.todo "qasm string_of_statement other case"
 
 and string_of_qop (q : qop) =
   match q with

@@ -185,7 +185,7 @@ let rec compile_uop (env: environment) (uop : Qasm.uop) : Circuit.gate list = ma
     in [gate]
   (* FIXME: It seems like this shouldn't be a semantic error but a parser error. *)
   | U (_, _) -> failwith "Illegal arbitrary single qubit unitary"
-  | CX (A_id (Id _src_reg, None), A_id (Id _tgt_reg, None)) -> todo ()
+  | CX (A_id (Id _src_reg, None), A_id (Id _tgt_reg, None)) -> todo "mapping CX over"
   | CX (A_id (Id src_reg, Some src_offset), A_id (Id tgt_reg, Some tgt_offset)) ->
     let tgt = resolve env.addrs tgt_reg (Qasm.int_of_nnint tgt_offset) in
     let src = resolve env.addrs src_reg (Qasm.int_of_nnint src_offset) in
@@ -227,9 +227,10 @@ let compile_stmt (cs : compile_state) (stmt : Qasm.stmt) : compile_state = match
       gates = cs.gates @ new_gates;
     }
   (* FIXME Ignore everything else for now *)
-  | _ -> todo ()
+  | _ -> todo "Ignore other compile_statement cases"
 
 let compile (prog : Qasm.t) : Circuit.t =
+  let _ = Printf.printf "%s\n---------\n" (Qasm.string_of_qasm prog) in
   let init_state = {
     env = new_environment ();
     gates = [];
