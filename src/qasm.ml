@@ -8,6 +8,8 @@ type t = {
 
 (** Type of Qasm statements *)
 and stmt =
+  (*  include statement *)
+  | Include of string
   (* Quantum register *)
   | Qreg of id * nnint
   (* Classical register *)
@@ -105,6 +107,7 @@ let rec string_of_stmt = function
       (string_of_ids params) (string_of_ids qargs)
       (string_of_list ~sep:", " string_of_gop gates)
   | Qop q -> string_of_qop q
+  | Include f -> Printf.sprintf "include \"%s\"" f
   | _ -> Utils.todo ()
 
 and string_of_qop (q : qop) =

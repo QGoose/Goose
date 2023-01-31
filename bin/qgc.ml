@@ -48,8 +48,8 @@ let speclist =
   [
     ("-i", Arg.String with_input, "Name of the input file (*.ir or *.qasm)");
     ("-o", Arg.String with_output, "Compile source to GooseIR");
-    ("-run", Arg.Unit (with_command Simulate), "Name of the input file (*.ir or *.qasm)");
-    ("-symex", Arg.Unit (with_command Symex), "Name of the input file (*.ir or *.qasm)");
+    ("-run", Arg.Unit (with_command Simulate), "Simulate the input circuit");
+    ("-symex", Arg.Unit (with_command Symex), "(Symbolically) Simulate the input");
   ]
 
 let execute () =

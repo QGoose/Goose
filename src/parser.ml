@@ -20,8 +20,13 @@ let parse_nnint =
 
 let parse_id =
   spaces
-  >> letter <~> many (alpha_num <|> exactly '_')
-     => (implode % id)
+  >> letter <~> many (upper <|> alpha_num <|> exactly '_')
+  => (implode % id)
+
+let parse_file_name =
+  spaces
+  >> letter <~> many (alpha_num <|> exactly '_' <|> exactly '.')
+  => implode
 
 let (let*) = (>>=)
 
@@ -64,6 +69,12 @@ and parse_const input =
   ] input
 
 let parse_stmt =
+  let inc =
+    let* _ = token "include" << space in
+    let* f = between (token "\"") (token "\"") parse_file_name in
+    let* _ = token ";" in
+    return (Include f)
+  in
   let qreg =
     let* _  = token "qreg" << space in
     let* id = parse_id in
@@ -178,6 +189,7 @@ let parse_stmt =
     return (Barrier l)
   in
   choice [
+    inc;
     qreg;
     creg;
     qop => (fun x -> Qop x);
