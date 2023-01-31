@@ -43,7 +43,7 @@ let emit_egraph se_egraph_state out =
   |> Array.iteri (emit_egraph_state out)
 
 (** Emits C code for a given quantum circuit to the provided output channel. *)
-let emitc circ out =
+let emitc out circ =
   let se_res = SE_Engine.run circ in
   
   let number_of_states = Int.to_string (Array.length se_res) in
@@ -60,7 +60,7 @@ let emitc circ out =
 
   flush out
 
-let emitc_egraph circ out = 
+let emitc_egraph out circ =
   let res = SE_Egraph_Engine.run circ in
   
   let number_of_states = Int.to_string (Array.length res) in
