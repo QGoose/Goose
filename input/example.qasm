@@ -1,3 +1,3 @@
 OPENQASM 2.0;
-include "test";
+include "./input/gates.qasm";
 h a[1];

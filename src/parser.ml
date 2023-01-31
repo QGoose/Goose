@@ -24,9 +24,8 @@ let parse_id =
   => (implode % id)
 
 let parse_file_name =
-  spaces
-  >> letter <~> many (alpha_num <|> exactly '_' <|> exactly '.')
-  => implode
+  let notquote = function '\"' -> false | _ -> true in
+  spaces >> many1 (Opal.satisfy notquote) => implode
 
 let (let*) = (>>=)
 
@@ -217,13 +216,37 @@ let parse_qasm =
     body = ast;
   }
 
+let parse_lib_file filename =
+  let src_ic = open_in filename in
+  try
+    let ast = Opal.parse (many1 parse_stmt) (LazyStream.of_channel src_ic) in
+    close_in src_ic;
+    match ast with
+    | Some ast -> ast
+    | None -> failwith (Printf.sprintf "Error while parsing %s" filename)
+  with e ->
+    close_in_noerr src_ic;
+    raise e
+
+module S = Set.Make(String)
+
+let rec preprocess (visited : S.t) (l : stmt list) =
+  List.concat_map (function
+    | Include f ->
+      if S.mem f visited then
+        failwith (Printf.sprintf "Cyclic include statement %s" f)
+      else
+        preprocess (S.add f visited) (parse_lib_file f)
+    | x -> [x]
+  ) l
+
 let parse_file filename =
   let src_ic = open_in filename in
   try
     let ast = Opal.parse parse_qasm (LazyStream.of_channel src_ic) in
     close_in src_ic;
     match ast with
-    | Some ast -> ast
+    | Some { version; body } -> { version; body = preprocess S.empty body }
     | None -> failwith "didn't parse"
   with e ->
     close_in_noerr src_ic;
